@@ -7,19 +7,36 @@
     android:layout_height="match_parent"
     tools:context=".StartPage">
 
-    <TextView
-        textwr
-        android:layout_width="313dp"
-        android:layout_height="75dp"
-        android:text="Logo here"
-        android:textAlignment="center"
-        android:textSize="50dp"
-        tools:layout_editor_absoluteX="51dp"
-        tools:layout_editor_absoluteY="231dp" />
+    <VideoView
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/startlogo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.395"
+        app:srcCompat="@drawable/logo" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/starttitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:layout_marginTop="-50dp"
+        android:text="SnapVault"
+        android:textColor="@color/white"
+        android:textSize="50dp"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@+id/startlogo"
+        android:visibility="invisible" />
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
