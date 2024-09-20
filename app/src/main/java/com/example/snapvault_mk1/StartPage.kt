@@ -44,31 +44,18 @@ class StartPage : AppCompatActivity() {
             bgVid.start()
         }
 
-        val animation = TranslateAnimation(
-            0f,
-            0f,
-            1000f,
-            0f
-        )
-        animation.duration = 1100
+        val animation = AlphaAnimation(0f, 1f).apply {}
+        animation.duration = 0
         animation.fillAfter = true
 
         startlogo.startAnimation(animation)
 
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
-            duration = 500
+            duration = 3000
             fillAfter = true
         }
-        animation.setAnimationListener(object : android.view.animation.Animation.AnimationListener {
-            override fun onAnimationStart(animation: android.view.animation.Animation?) {
-            }
+        starttitle.startAnimation(fadeInAnimation)
 
-            override fun onAnimationEnd(animation: android.view.animation.Animation?) {
-                starttitle.startAnimation(fadeInAnimation)
-            }
 
-            override fun onAnimationRepeat(animation: android.view.animation.Animation?) {
-            }
-
-    })
-}}
+    }
+}
