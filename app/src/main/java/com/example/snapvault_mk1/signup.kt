@@ -104,7 +104,7 @@ class signup : AppCompatActivity() {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@signup, "Signup successful!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@signup, login::class.java)
+                    val intent = Intent(this@signup, Login::class.java)
                     startActivity(intent)
                 } else {
                     Toast.makeText(this@signup, "Signup failed: ${response.message()}", Toast.LENGTH_SHORT).show()
