@@ -7,51 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/snapVtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SnapVault"
-        android:textSize="70sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
-
-    <ImageView
-        android:id="@+id/snapVlogo"
-        android:layout_width="match_parent"
-        android:layout_height="320dp"
-        android:contentDescription="Logo"
-        app:srcCompat="@drawable/logo"
-        app:layout_constraintTop_toBottomOf="@id/snapVtitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/loginbutton"
-        android:layout_width="139dp"
-        android:layout_height="57dp"
-        android:backgroundTint="@color/myButtoncolor"
-        android:text="Log in"
-        app:layout_constraintBaseline_toBottomOf="@id/snapVlogo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.172"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="465dp" />
-
-    <Button
-        android:id="@+id/signupbutton"
-        android:layout_width="139dp"
-        android:layout_height="57dp"
-        android:backgroundTint="@color/myButtoncolor"
-        android:text="Sign up"
-        app:layout_constraintBaseline_toBottomOf="@id/snapVlogo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.827"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="465dp" />
+ <!-- UN USED NA ITO. MALI KASI PAG CODE KAYA BAWAL TANGGALIN -->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

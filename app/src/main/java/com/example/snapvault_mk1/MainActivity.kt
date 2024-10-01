@@ -19,19 +19,7 @@ class MainActivity : AppCompatActivity() {
             insets
 
         }
-
-        val loginbutton: Button = findViewById(R.id.loginbutton)
-        val signupbutton: Button = findViewById(R.id.signupbutton)
-
-        loginbutton.setOnClickListener{
-            val Intent = Intent (this,Login::class.java)
-            startActivity(Intent)
-        }
-
-        signupbutton.setOnClickListener{
-            val Intent = Intent (this,signup::class.java)
-            startActivity(Intent)
-        }
+//UNUSED DUE TO CODING TROUBLES
 
     }
 }
