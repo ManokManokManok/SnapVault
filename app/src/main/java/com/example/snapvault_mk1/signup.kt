@@ -33,6 +33,7 @@ class signup : AppCompatActivity() {
     private lateinit var emailEditText: EditText
     private lateinit var usernameEditText: EditText
     private lateinit var passwordEditText: EditText
+    private lateinit var backButton: Button
     private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +42,10 @@ class signup : AppCompatActivity() {
 
         emailEditText = findViewById(R.id.email)
         usernameEditText = findViewById(R.id.username)
+        backButton = findViewById(R.id.back_btn)
 
-        val signupButton: Button = findViewById(R.id.signupbutton)
+        val signinButton: Button = findViewById(R.id.signin)
+        val signupButton: Button = findViewById(R.id.signupButton)
         passwordEditText = findViewById(R.id.password)
 
         signupButton.setOnClickListener {
@@ -57,6 +60,15 @@ class signup : AppCompatActivity() {
             } else {
                 sendSignupData(email, username, password)
             }
+        }
+
+        signinButton.setOnClickListener {
+            val intent = Intent(this@signup, Login::class.java)
+            startActivity(intent)
+        }
+
+        backButton.setOnClickListener {
+            finish()
         }
 
         passwordEditText.setOnTouchListener { v, event ->

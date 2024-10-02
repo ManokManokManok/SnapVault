@@ -5,74 +5,185 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#89D31E"
     tools:context=".signup">
 
-    <ImageView
-        android:id="@+id/loginsnapVlogo"
-        android:layout_width="409dp"
-        android:layout_height="321dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/logo"
-        tools:layout_editor_absoluteY="-6dp" />
-
-
     <Button
-        android:id="@+id/signupbutton"
-        android:layout_width="139dp"
-        android:layout_height="57dp"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="@color/myButtoncolor"
-        android:text="Continue"
+        android:id="@+id/back_btn"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/back_icon"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.041"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="370dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="150dp"
+        android:text="Your memories deserve the best—create your SnapVault account now.."
+        android:textColor="@color/black"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.41"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="200dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="72dp"
+        android:text="Sign Up"
+        android:textColor="@color/black"
+        android:textSize="55dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.074"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="450dp"
+        android:layout_height="780dp"
+        android:layout_marginTop="152dp"
+        android:background="@drawable/background_corner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back_btn" />
+
     <EditText
         android:id="@+id/email"
-        android:layout_width="352dp"
+        android:layout_width="290dp"
         android:layout_height="67dp"
-        android:hint="Email"
+        android:layout_marginTop="256dp"
+        android:background="@drawable/semi_circle_corner"
         android:ems="10"
-        android:padding="10dp"
+        android:hint="Email"
         android:inputType="text"
-        app:layout_constraintTop_toBottomOf="@id/loginsnapVlogo"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintHorizontal_bias="0.702"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="276dp" />
+        app:layout_constraintTop_toBottomOf="@id/back_btn" />
+
+    <TextView
+        android:id="@+id/emailicon"
+        android:layout_width="60dp"
+        android:layout_height="67dp"
+        android:layout_marginStart="51dp"
+        android:layout_marginTop="256dp"
+        android:background="@drawable/semi_circle_left"
+        android:drawableLeft="@drawable/email_icon"
+        android:padding="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back_btn" />
 
     <EditText
         android:id="@+id/username"
-        android:layout_width="352dp"
+        android:layout_width="290dp"
         android:layout_height="67dp"
-        android:hint="Username"
+        android:layout_marginTop="332dp"
+        android:background="@drawable/semi_circle_corner"
         android:ems="10"
-        android:padding="10dp"
+        android:hint="Username"
         android:inputType="text"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/email"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintHorizontal_bias="0.708"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="276dp" />
+        app:layout_constraintTop_toBottomOf="@id/back_btn" />
+
+    <TextView
+        android:id="@+id/passicon"
+        android:layout_width="60dp"
+        android:layout_height="67dp"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="332dp"
+        android:background="@drawable/semi_circle_left"
+        android:drawableLeft="@drawable/user_icon"
+        android:padding="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back_btn" />
 
     <EditText
         android:id="@+id/password"
-        android:layout_width="352dp"
-        android:layout_height="60dp"
-        android:hint="Create a Password"
+        android:layout_width="290dp"
+        android:layout_height="67dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/semi_circle_corner"
+        android:drawableRight="@drawable/eyev"
         android:ems="10"
-        android:padding="10dp"
+        android:hint="Password"
         android:inputType="textPassword"
         android:longClickable="false"
-        android:drawableRight="@drawable/eyev"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/username"
+        android:padding="12dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintHorizontal_bias="0.702"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="343dp" />
+        app:layout_constraintTop_toBottomOf="@id/username" />
+
+    <TextView
+        android:id="@+id/usernameicon"
+        android:layout_width="60dp"
+        android:layout_height="67dp"
+        android:layout_marginStart="51dp"
+        android:layout_marginTop="407dp"
+        android:background="@drawable/semi_circle_left"
+        android:drawableLeft="@drawable/pass_icon"
+        android:padding="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back_btn" />
+
+
+
+    <TextView
+        android:id="@+id/dhac"
+        android:layout_width="180dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="93dp"
+        android:layout_marginTop="588dp"
+        android:text="Already have an account?"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/back_btn" />
+
+
+    <Button
+        android:id="@+id/signin"
+        android:layout_width="97dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="104dp"
+        android:layout_marginEnd="111dp"
+        android:background="@drawable/btn_transparent"
+        android:text="Sign In"
+        android:textColor="#0CB84E"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password" />
+
+    <Button
+        android:id="@+id/signupButton"
+        android:layout_width="150dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="48dp"
+        android:backgroundTint="#698F42"
+        android:text="Sign Up"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
 
 

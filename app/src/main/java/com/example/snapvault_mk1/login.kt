@@ -34,6 +34,8 @@ class Login : AppCompatActivity() {
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
+    private lateinit var backButton: Button
+    private lateinit var signunButton: Button
     private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +45,9 @@ class Login : AppCompatActivity() {
         // Initialize the views
         emailEditText = findViewById(R.id.username)
         passwordEditText = findViewById(R.id.password)
-        loginButton = findViewById(R.id.loginButton) // Make sure this ID matches your XML layout
+        loginButton = findViewById(R.id.loginButton)
+        backButton = findViewById(R.id.back_btn)
+        signunButton = findViewById(R.id.signup)
 
         // Handle password visibility toggle
         passwordEditText.setOnTouchListener { v, event ->
@@ -67,6 +71,15 @@ class Login : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        signunButton.setOnClickListener {
+            val intent = Intent(this, signup::class.java)
+            startActivity(intent)
+        }
+
+        backButton.setOnClickListener {
+            finish()
         }
     }
 
@@ -105,7 +118,7 @@ class Login : AppCompatActivity() {
                         val id = jsonObject.getInt("id")
 
                         // Show success message and navigate to the next screen
-                        Toast.makeText(this@Login, "Welcome, $username!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@Login, "Hello, $username!", Toast.LENGTH_SHORT).show()
 
                         val intent = Intent(this@Login, WelcomeActivity::class.java)
                         intent.putExtra("username", username)
