@@ -1,6 +1,7 @@
 package com.example.snapvault_mk1
 
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.MotionEvent
 import android.widget.EditText
@@ -19,6 +20,9 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 import android.util.Log
+import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
+
 
 interface LoginApi {
     @FormUrlEncoded
@@ -30,11 +34,11 @@ interface LoginApi {
 }
 
 class Login : AppCompatActivity() {
+    private var isPopupShown = false
 
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
-    private lateinit var backButton: Button
     private lateinit var signunButton: Button
     private var isPasswordVisible = false
 
@@ -46,8 +50,30 @@ class Login : AppCompatActivity() {
         emailEditText = findViewById(R.id.username)
         passwordEditText = findViewById(R.id.password)
         loginButton = findViewById(R.id.loginButton)
-        backButton = findViewById(R.id.back_btn)
         signunButton = findViewById(R.id.signup)
+
+        val main = findViewById<ConstraintLayout>(R.id.main)
+        val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
+
+        val popup = listOf<View>(
+            findViewById(R.id.background),
+            findViewById(R.id.username),
+            findViewById(R.id.usernameicon),
+            findViewById(R.id.password),
+            findViewById(R.id.passicon),
+            findViewById(R.id.forgetpass),
+            findViewById(R.id.loginButton),
+            findViewById(R.id.dhac),
+            findViewById(R.id.signup)
+
+        )
+
+        popup.forEach { it.visibility = View.GONE }
+
+        if (!isPopupShown) {
+            showPopup(popup, heightOfScreen)
+            isPopupShown = true
+        }
 
         // Handle password visibility toggle
         passwordEditText.setOnTouchListener { v, event ->
@@ -78,8 +104,17 @@ class Login : AppCompatActivity() {
             startActivity(intent)
         }
 
-        backButton.setOnClickListener {
-            finish()
+    }
+
+    private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
+        popupViews.forEach { view ->
+            view.visibility = View.VISIBLE
+            view.translationY = heightOfScreen.toFloat()
+
+            view.animate()
+                .translationY(0f)
+                .setDuration(500)
+                .start()
         }
     }
 
