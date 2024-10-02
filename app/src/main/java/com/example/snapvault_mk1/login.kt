@@ -52,6 +52,8 @@ class Login : AppCompatActivity() {
         loginButton = findViewById(R.id.loginButton)
         signunButton = findViewById(R.id.signup)
 
+        val forgotpass = findViewById<Button>(R.id.forgetpass)
+
         val main = findViewById<ConstraintLayout>(R.id.main)
         val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
 
@@ -101,6 +103,11 @@ class Login : AppCompatActivity() {
 
         signunButton.setOnClickListener {
             val intent = Intent(this, signup::class.java)
+            startActivity(intent)
+        }
+
+        forgotpass.setOnClickListener {
+            val intent = Intent(this, ForgotPass::class.java)
             startActivity(intent)
         }
 

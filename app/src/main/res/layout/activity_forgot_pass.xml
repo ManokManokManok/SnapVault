@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightgreen"
+    tools:context=".ForgotPass">
+
+    <TextView
+        android:id="@+id/forgot"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="72dp"
+        android:text="Forgot Password?"
+        android:textColor="@color/black"
+        android:fontFamily="@font/fredoka_regular"
+        android:textSize="55dp"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="370dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="10dp"
+        android:text="It happens! Let’s help you reset your password and get back to your moments."
+        android:fontFamily="@font/fredoka_light"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.41"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/forgot" />
+
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="422dp"
+        android:layout_height="780dp"
+        android:background="@drawable/background_corner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/message" />
+
+    <ImageView
+        android:id="@+id/forgotlogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/forgotpass"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/message" />
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="370dp"
+        android:layout_height="70dp"
+        android:text="Please Enter Your Email Address to Receive a verification Code."
+        android:fontFamily="@font/fredoka_light"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/forgotlogo" />
+
+    <TextView
+        android:id="@+id/emailicon"
+        android:layout_width="60dp"
+        android:layout_height="67dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/semi_circle_left"
+        android:drawableLeft="@drawable/email_icon"
+        android:padding="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/info" />
+
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="290dp"
+        android:layout_height="67dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/semi_circle_corner"
+        android:ems="10"
+        android:fontFamily="@font/fredoka_regular"
+        android:textSize="25sp"
+        android:hint="Email"
+        android:inputType="text"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        app:layout_constraintStart_toEndOf="@id/emailicon"
+        app:layout_constraintTop_toBottomOf="@id/info" />
+
+    <Button
+        android:id="@+id/sendForgotPass"
+        android:layout_width="150dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="19dp"
+        android:backgroundTint="#698F42"
+        android:text="Send"
+        android:textSize="30sp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/fredoka_regular"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email" />
+
+    <TextView
+        android:id="@+id/changedmind"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="Changed your mind?"
+        android:fontFamily="@font/fredoka_regular"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sendForgotPass" />
+
+    <Button
+        android:id="@+id/backtostart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_transparent"
+        android:text="Back to Start Page"
+        android:fontFamily="@font/fredoka_regular"
+        android:textSize="20sp"
+        android:textColor="#0CB84E"
+        android:layout_marginTop="-30dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/changedmind"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
