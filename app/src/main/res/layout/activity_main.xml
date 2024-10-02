@@ -5,9 +5,10 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:backgroundTint="#FFFFFF"
     tools:context=".MainActivity">
 
  <!-- UN USED NA ITO. MALI KASI PAG CODE KAYA BAWAL TANGGALIN -->
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.example.snapvault_mk1
 
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
