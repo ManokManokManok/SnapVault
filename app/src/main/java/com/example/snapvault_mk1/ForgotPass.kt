@@ -48,11 +48,12 @@ class ForgotPass : AppCompatActivity() {
 
         val backtostart = findViewById<Button>(R.id.backtostart)
         backtostart.setOnClickListener {
-            // Handle the sign-in button click
-            val intent = Intent(this, Login::class.java) // Replace with your actual activity
+
+            val intent = Intent(this, Login::class.java)
             startActivity(intent)
         }
     }
+
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
         popupViews.forEach { view ->
             view.visibility = View.VISIBLE
@@ -60,6 +61,7 @@ class ForgotPass : AppCompatActivity() {
 
             view.animate()
                 .translationY(0f)
+                .setStartDelay(200)
                 .setDuration(500)
                 .start()
         }

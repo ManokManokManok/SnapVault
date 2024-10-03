@@ -120,6 +120,7 @@ class Login : AppCompatActivity() {
 
             view.animate()
                 .translationY(0f)
+                .setStartDelay(200)
                 .setDuration(500)
                 .start()
         }
