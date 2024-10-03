@@ -9,6 +9,14 @@
     android:orientation="vertical">
 
     <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/all_folder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SnapVault"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        />
 
 
 </FrameLayout>
