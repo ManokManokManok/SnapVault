@@ -7,47 +7,78 @@
     android:gravity="top"
     android:orientation="vertical">
 
-
-    <TextView
-        android:id="@+id/homepage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SnapVault"
-        android:textSize="35dp"
-        android:textStyle="bold"
-        tools:ignore="MissingConstraints" />
-
     <TextView
         android:id="@+id/welcomeTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/homepage"
-        android:gravity="center"
+        android:gravity="left"
         android:textSize="40dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintTop_toBottomOf="@+id/homepage"
-        app:layout_constraintVertical_bias="0.031"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="26dp" />
+        />
 
-    <FrameLayout
-        android:id="@+id/frame_layout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
+    <EditText
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:drawableLeft="@drawable/ic_search"
+        android:background="@drawable/rounded"
+        android:hint="Search your files"
+        app:layout_constraintTop_toBottomOf="@id/welcomeTextView"
+        />
+
+
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="@drawable/border_background"
+        app:constraint_referenced_ids="background"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-    </FrameLayout>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_nav" />
+        />
 
+    <ImageView
+        android:id="@+id/home"
+        android:layout_width="51dp"
+        android:layout_height="46dp"
+        app:srcCompat="@drawable/ic_home"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="25dp"
+        android:layout_marginStart="30dp"
+        />
+
+    <ImageView
+        android:id="@+id/folder"
+        android:layout_width="51dp"
+        android:layout_height="46dp"
+        app:srcCompat="@drawable/ic_folder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/home"
+        android:layout_marginBottom="25dp"
+        android:layout_marginStart="60dp"
+        />
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="51dp"
+        android:layout_height="46dp"
+        app:srcCompat="@drawable/ic_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/folder"
+        android:layout_marginBottom="25dp"
+        android:layout_marginStart="60dp"
+        />
+
+    <ImageView
+        android:id="@+id/person"
+        android:layout_width="51dp"
+        android:layout_height="46dp"
+        app:srcCompat="@drawable/ic_person"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/image"
+        android:layout_marginBottom="25dp"
+        android:layout_marginStart="60dp"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
