@@ -1,14 +1,17 @@
 package com.example.snapvault_mk1
 
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.MotionEvent
 import android.widget.EditText
 import android.text.InputType
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,11 +32,11 @@ interface ApiService {
 }
 
 class signup : AppCompatActivity() {
+    private var isPopupShown = false
 
     private lateinit var emailEditText: EditText
     private lateinit var usernameEditText: EditText
     private lateinit var passwordEditText: EditText
-    private lateinit var backButton: Button
     private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,11 +45,36 @@ class signup : AppCompatActivity() {
 
         emailEditText = findViewById(R.id.email)
         usernameEditText = findViewById(R.id.username)
-        backButton = findViewById(R.id.back_btn)
 
         val signinButton: Button = findViewById(R.id.signin)
         val signupButton: Button = findViewById(R.id.signupButton)
         passwordEditText = findViewById(R.id.password)
+
+        val main = findViewById<ConstraintLayout>(R.id.main)
+        val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
+
+        //DITO YUNG MGA VALUES NYA. NILAGAY KO ULI PRA MINSANANG CALL HAYAAN NYO NA YUNG WARNING
+        val popup = listOf<View>(
+            findViewById(R.id.background),
+            findViewById(R.id.email),
+            findViewById(R.id.emailicon),
+            findViewById(R.id.username),
+            findViewById(R.id.usernameicon),
+            findViewById(R.id.password),
+            findViewById(R.id.passicon),
+            findViewById(R.id.signupButton),
+            findViewById(R.id.dhac),
+            findViewById(R.id.signin)
+
+        )
+
+        // DITO YUNG SA AUTO START NG ANIMATION
+        popup.forEach { it.visibility = View.GONE }
+
+        if (!isPopupShown) {
+            showPopup(popup, heightOfScreen)
+            isPopupShown = true
+        }
 
         signupButton.setOnClickListener {
             val password = passwordEditText.text.toString()
@@ -67,9 +95,6 @@ class signup : AppCompatActivity() {
             startActivity(intent)
         }
 
-        backButton.setOnClickListener {
-            finish()
-        }
 
         passwordEditText.setOnTouchListener { v, event ->
             val DRAWABLE_RIGHT = 2
@@ -88,6 +113,19 @@ class signup : AppCompatActivity() {
                 }
             }
             false
+        }
+    }
+
+    //DITO YUNG DUN SA ANIMATION NG PAG TAAS
+    private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
+        popupViews.forEach { view ->
+            view.visibility = View.VISIBLE
+            view.translationY = heightOfScreen.toFloat()
+
+            view.animate()
+                .translationY(0f)
+                .setDuration(500)
+                .start()
         }
     }
 

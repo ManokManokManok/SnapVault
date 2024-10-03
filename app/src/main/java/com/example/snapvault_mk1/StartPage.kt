@@ -36,7 +36,7 @@ class StartPage : AppCompatActivity() {
         val starttitle = findViewById<ImageView>(R.id.starttitle)
         val main = findViewById<ConstraintLayout>(R.id.startpage)
 
-        // Define the popup views
+        // WAG PANSININ WARNING. GINAWA TO PRA MINSANAN
         val popup = listOf<View>(
             findViewById(R.id.welcomebox),
             findViewById(R.id.welcometext),
@@ -44,27 +44,24 @@ class StartPage : AppCompatActivity() {
             findViewById(R.id.signupbuttongreen)
         )
 
-        // Hide the popup views initially
         popup.forEach { it.visibility = View.GONE }
 
-        // Set the video URI (assuming you have a VideoView for this)
-        val videoUri = Uri.parse("android.resource://${packageName}/${R.raw.startbackground}")
 
-        // Fade-in animation for logo
+        // ANIMATION NG LOGO
         val logoAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 1000
             fillAfter = true
         }
         startlogo.startAnimation(logoAnimation)
 
-        // Fade-in animation for title
+        // ANIMATION NG TITLE
         val fadeInAnimation = AlphaAnimation(0f, 1f).apply {
             duration = 2000
             fillAfter = true
         }
         starttitle.startAnimation(fadeInAnimation)
 
-        // Click listener to show the popup
+        // LISTENER PRA MAG GO YUNG ANIMATION NG POPUP
         main.setOnClickListener {
             if (!isPopupShown) {
                 showPopup(popup, heightOfScreen)
@@ -73,7 +70,7 @@ class StartPage : AppCompatActivity() {
             }
         }
 
-        // OnClickListener for the sign-in button
+        // CLICK LISTENER NG SIGN IN BUTTON
         val signinButton = findViewById<Button>(R.id.signinbutton)
         signinButton.setOnClickListener {
             // Handle the sign-in button click
@@ -81,6 +78,7 @@ class StartPage : AppCompatActivity() {
             startActivity(intent)
         }
 
+        //CLICK LISTENER NG SIGN UP BUTTON
         val signupbutton = findViewById<Button>(R.id.signupbuttongreen)
         signupbutton.setOnClickListener {
             // Handle the sign-in button click
@@ -91,7 +89,7 @@ class StartPage : AppCompatActivity() {
 
 
 
-    // Method to show the popup views with animation
+    // POPUP ANIMATION
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
         popupViews.forEach { view ->
             view.visibility = View.VISIBLE
@@ -103,18 +101,18 @@ class StartPage : AppCompatActivity() {
         }
     }
 
-    // Method to animate the logo and title upward
+    // ANIMATION NG LOGO AND TITLE PRA UMANGAT PAG UMANGAT NA SI POPUP
     private fun animateLogoAndTitle() {
         val startlogo = findViewById<ImageView>(R.id.startlogo)
         val starttitle = findViewById<ImageView>(R.id.starttitle)
 
-        // Animate the logo upward
+        // DITO SA LOGO
         startlogo.animate()
             .translationY(-500f) // Adjust as needed
             .setDuration(500) // Duration of the animation
             .start()
 
-        // Animate the title upward
+        // DITO SA TITLE
         starttitle.animate()
             .translationY(-500f) // Adjust as needed
             .setDuration(500) // Duration of the animation
