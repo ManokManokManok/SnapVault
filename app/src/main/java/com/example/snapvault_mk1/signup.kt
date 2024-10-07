@@ -23,7 +23,7 @@ import retrofit2.http.POST
 
 interface ApiService {
     @FormUrlEncoded
-    @POST("signup.php") //DAPAT ITO YUNG SA PHP SHIT MO
+    @POST("signup.php") // Make sure this points to your PHP script
     fun signup(
         @Field("email") email: String,
         @Field("username") username: String,
@@ -53,7 +53,7 @@ class signup : AppCompatActivity() {
         val main = findViewById<ConstraintLayout>(R.id.main)
         val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
 
-        //DITO YUNG MGA VALUES NYA. NILAGAY KO ULI PRA MINSANANG CALL HAYAAN NYO NA YUNG WARNING
+        // Setup views
         val popup = listOf<View>(
             findViewById(R.id.background),
             findViewById(R.id.email),
@@ -65,10 +65,9 @@ class signup : AppCompatActivity() {
             findViewById(R.id.signupButton),
             findViewById(R.id.dhac),
             findViewById(R.id.signin)
-
         )
 
-        // DITO YUNG SA AUTO START NG ANIMATION
+        // Dito YUNG MGA VALUES NYA
         popup.forEach { it.visibility = View.GONE }
 
         if (!isPopupShown) {
@@ -95,7 +94,6 @@ class signup : AppCompatActivity() {
             startActivity(intent)
         }
 
-
         passwordEditText.setOnTouchListener { v, event ->
             val DRAWABLE_RIGHT = 2
 
@@ -116,7 +114,6 @@ class signup : AppCompatActivity() {
         }
     }
 
-    //DITO YUNG DUN SA ANIMATION NG PAG TAAS
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
         popupViews.forEach { view ->
             view.visibility = View.VISIBLE
@@ -154,11 +151,19 @@ class signup : AppCompatActivity() {
         apiService.signup(email, username, password).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
+                    // MADE IT SO THAT CHAKA LANG NYA SABIHIN IF WALANG ERROR
                     Toast.makeText(this@signup, "Signup successful!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this@signup, Login::class.java)
                     startActivity(intent)
                 } else {
-                    Toast.makeText(this@signup, "Signup failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    // DITO KINU KUHA NYA YUNG ERROR RESPONSE NG .PHP FILES NATIN
+                    response.errorBody()?.let { errorBody ->
+                        // Use a Toast to show the error message from the PHP backend
+                        Toast.makeText(this@signup, errorBody.string(), Toast.LENGTH_SHORT).show()
+                    } ?: run {
+                        // ITO IF WALANG MAHANAP NA ERROR
+                        Toast.makeText(this@signup, "Signup failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
