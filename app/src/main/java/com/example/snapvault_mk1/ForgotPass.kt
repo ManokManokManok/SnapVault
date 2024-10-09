@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -22,7 +21,7 @@ import retrofit2.http.POST
 
 interface ForgotPassApi {
     @FormUrlEncoded
-    @POST("forgot_password.php") // Make sure this points to your PHP script
+    @POST("forgot_password.php") // Ensure this matches your PHP script location
     fun forgotPassword(
         @Field("email") email: String // Sending email to the server
     ): Call<ResponseBody>
@@ -95,6 +94,9 @@ class ForgotPass : AppCompatActivity() {
     }
 
     private fun sendForgotPasswordData(email: String) {
+        // Show a Toast message indicating that the email is being sent
+        Toast.makeText(this, "Sending email...", Toast.LENGTH_SHORT).show()
+
         val retrofit = Retrofit.Builder()
             .baseUrl("http://10.0.2.2/") // Replace with your actual IP address or base URL
             .addConverterFactory(GsonConverterFactory.create())
@@ -105,28 +107,29 @@ class ForgotPass : AppCompatActivity() {
         forgotPassApi.forgotPassword(email).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    // Check the response body for the specific message from your PHP
                     response.body()?.let { responseBody ->
                         // Use the response string from the PHP backend
                         val responseMessage = responseBody.string()
                         Toast.makeText(this@ForgotPass, responseMessage, Toast.LENGTH_SHORT).show()
+
+                        // Navigate to the verification activity if the email was sent successfully
+                        val intent = Intent(this@ForgotPass, forgot_pass_verification::class.java) // Changed to the correct activity name
+                        intent.putExtra("email", email) // Pass the email to the next activity if needed
+                        startActivity(intent)
+                        finish() // Finish the current activity if needed
                     } ?: run {
-                        // Fallback if no response message is available
                         Toast.makeText(this@ForgotPass, "Unexpected error occurred.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    // Retrieve the error message from the PHP backend
                     response.errorBody()?.let { errorBody ->
                         Toast.makeText(this@ForgotPass, errorBody.string(), Toast.LENGTH_SHORT).show()
                     } ?: run {
-                        // Fallback if no error message is available
                         Toast.makeText(this@ForgotPass, "Failed to send email: ${response.message()}", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                // Handle failure in the network request
                 Toast.makeText(this@ForgotPass, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
