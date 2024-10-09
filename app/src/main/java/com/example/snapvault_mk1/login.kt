@@ -160,7 +160,6 @@ class Login : AppCompatActivity() {
                         val username = jsonObject.getString("username")
                         val id = jsonObject.getInt("id")
 
-                        // Show success message and navigate to the next screen
                         Toast.makeText(this@Login, "Hello, $username!", Toast.LENGTH_SHORT).show()
 
                         val intent = Intent(this@Login, WelcomeActivity::class.java)

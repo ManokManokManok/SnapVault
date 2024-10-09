@@ -44,8 +44,10 @@
         android:id="@+id/background"
         android:layout_width="422dp"
         android:layout_height="780dp"
+        android:layout_marginTop="60dp"
         android:background="@drawable/background_corner"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.615"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/message" />
 
@@ -152,7 +154,7 @@
         android:layout_marginTop="90dp"
         android:background="@drawable/semi_circle_corner"
         android:ems="10"
-        android:hint="Username"
+        android:hint="Email"
         android:fontFamily="@font/fredoka_regular"
         android:textSize="25sp"
         android:inputType="text"
