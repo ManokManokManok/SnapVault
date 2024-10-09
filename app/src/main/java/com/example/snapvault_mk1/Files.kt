@@ -10,7 +10,7 @@ class Files : AppCompatActivity() {
 
     private lateinit var homeIcon: ImageView
     private lateinit var fileIcon: ImageView
-    private lateinit var imageIcon: ImageView
+    private lateinit var createIcon: ImageView
     private lateinit var personIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,14 +22,14 @@ class Files : AppCompatActivity() {
 
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
-        imageIcon = findViewById(R.id.image)
+        createIcon = findViewById(R.id.image)
         personIcon = findViewById(R.id.person)
 
         val welcomeMessage = findViewById<TextView>(R.id.welcomeTextView)
         welcomeMessage.text = "Welcome, $username!"
 
         homeIcon.setOnClickListener {
-            val intent = Intent(this, Files::class.java)
+            val intent = Intent(this, WelcomeActivity::class.java)
             startActivity(intent)
         }
 
@@ -38,8 +38,8 @@ class Files : AppCompatActivity() {
             startActivity(intent)
         }
 
-        imageIcon.setOnClickListener {
-            val intent = Intent(this, Image::class.java)
+        createIcon.setOnClickListener {
+            val intent = Intent(this, Createalbum::class.java)
             startActivity(intent)
         }
 

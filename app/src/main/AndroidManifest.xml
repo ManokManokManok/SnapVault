@@ -23,12 +23,15 @@
             android:exported="false" />
         <activity
             android:name=".User"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
-            android:name=".Image"
+            android:name=".Createalbum"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".Files"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".ForgotPass"
@@ -36,6 +39,7 @@
         <activity
             android:name=".WelcomeActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/title_activity_welcome_test"
             android:theme="@style/Theme.SnapVaultMk1" />
         <activity

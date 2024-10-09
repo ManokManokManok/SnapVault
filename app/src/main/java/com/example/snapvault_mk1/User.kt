@@ -4,28 +4,25 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class User : AppCompatActivity() {
 
     private lateinit var homeIcon: ImageView
     private lateinit var fileIcon: ImageView
-    private lateinit var imageIcon: ImageView
+    private lateinit var createIcon: ImageView
     private lateinit var personIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_person)
+        setContentView(R.layout.activity_user)
 
         val username = intent.getStringExtra("username")
         val id = intent.getIntExtra("id", -1)
 
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
-        imageIcon = findViewById(R.id.image)
+        createIcon = findViewById(R.id.image)
         personIcon = findViewById(R.id.person)
 
         val welcomeMessage = findViewById<TextView>(R.id.welcomeTextView)
@@ -41,8 +38,8 @@ class User : AppCompatActivity() {
             startActivity(intent)
         }
 
-        imageIcon.setOnClickListener {
-            val intent = Intent(this, Image::class.java)
+        createIcon.setOnClickListener {
+            val intent = Intent(this, Createalbum::class.java)
             startActivity(intent)
         }
 

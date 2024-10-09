@@ -7,23 +7,24 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 
-
 class WelcomeActivity : AppCompatActivity() {
 
+
     private lateinit var fileIcon: ImageView
-    private lateinit var imageIcon: ImageView
+    private lateinit var createIcon: ImageView
     private lateinit var personIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome_test)
 
+
         // Retrieve the intent data
         val username = intent.getStringExtra("username")
         val id = intent.getIntExtra("id", -1)
 
         fileIcon = findViewById(R.id.folder)
-        imageIcon = findViewById(R.id.image)
+        createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
 
         // Display the username on the WelcomeActivity
@@ -35,10 +36,12 @@ class WelcomeActivity : AppCompatActivity() {
             startActivity(intent)
 
         }
-        imageIcon.setOnClickListener {
-            val intent = Intent(this, Image::class.java)
+
+        createIcon.setOnClickListener {
+            val intent = Intent(this, Createalbum::class.java)
             startActivity(intent)
         }
+
         personIcon.setOnClickListener {
             val intent = Intent(this, User::class.java)
             startActivity(intent)

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/welcomebox"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:background="@drawable/bg_rounder_corner"
+            android:paddingTop="40dp"
+            android:paddingLeft="10dp"
+            android:text="New Album"
+            android:gravity="center_horizontal"
+            android:textSize="55sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/fredoka_regular"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+
+        <EditText
+            android:id="@+id/albumname"
+            android:layout_width="400dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="28dp"
+            android:layout_marginBottom="260dp"
+            android:background="@drawable/circle_corner"
+            android:gravity="center"
+            android:hint="Enter an Album name"
+            android:inputType="text"
+            android:textColorHint="@color/black"
+            android:textColor="@color/black"
+            android:fontFamily="@font/fredoka_regular"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/cancelbutton"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="28dp"
+            android:layout_marginBottom="135dp"
+            android:backgroundTint="#D9FFB3"
+            android:fontFamily="@font/fredoka_regular"
+            android:text="Cancel"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/close_upbutton"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="172dp"
+            android:layout_marginBottom="412dp"
+            android:backgroundTint="@color/darkgreen"
+            android:gravity="center_horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/createbutton"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="135dp"
+            android:backgroundTint="#D9FFB3"
+            android:fontFamily="@font/fredoka_regular"
+            android:text="Create"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/album"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="160dp"
+            android:layout_marginRight="220dp"
+            android:text="Albums"
+            android:textColor="@color/black"
+            android:textSize="50sp"
+            android:fontFamily="@font/fredoka_regular"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/sorting"
+            android:layout_width="65dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="160dp"
+            android:layout_marginRight="104dp"
+            android:background="@drawable/semi_circle_left"
+            android:drawableLeft="@drawable/images_icon"
+            android:padding="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/sorting2"
+            android:layout_width="65dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="160dp"
+            android:layout_marginRight="40dp"
+            android:background="@drawable/semi_circle_corner"
+            android:drawableLeft="@drawable/sorting_images"
+            android:padding="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/welcomeTextView"
+            android:layout_width="400dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="16dp"
+            android:textSize="35dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="310dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginStart="40dp"
+            android:padding="15dp"
+            android:fontFamily="@font/fredoka_regular"
+            android:background="@drawable/semi_circle_corner"
+            android:hint="Search your files"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/welcomeTextView" />
+
+        <TextView
+            android:id="@+id/usernameicon"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="340dp"
+            android:background="@drawable/semi_circle_left"
+            android:drawableLeft="@drawable/imagesearch_icon"
+            android:padding="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/welcomeTextView" />
+
+        <ImageView
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:background="@drawable/border_background"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageView
+            android:id="@+id/home"
+            android:layout_width="51dp"
+            android:layout_height="46dp"
+            android:background="@drawable/ic_home"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="25dp"
+            android:layout_marginStart="30dp" />
+
+        <ImageView
+            android:id="@+id/folder"
+            android:layout_width="51dp"
+            android:layout_height="46dp"
+            android:background="@drawable/ic_folder"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/home"
+            android:layout_marginBottom="25dp"
+            android:layout_marginStart="60dp" />
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="51dp"
+            android:layout_height="46dp"
+            android:background="@drawable/create_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/folder"
+            android:layout_marginBottom="25dp"
+            android:layout_marginStart="60dp" />
+
+        <ImageView
+            android:id="@+id/person"
+            android:layout_width="51dp"
+            android:layout_height="46dp"
+            android:background="@drawable/ic_person"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/image"
+            android:layout_marginBottom="25dp"
+            android:layout_marginStart="60dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
