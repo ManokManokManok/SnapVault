@@ -17,16 +17,10 @@ class Files : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_files)
 
-        val username = intent.getStringExtra("username")
-        val id = intent.getIntExtra("id", -1)
-
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
         createIcon = findViewById(R.id.image)
         personIcon = findViewById(R.id.person)
-
-        val welcomeMessage = findViewById<TextView>(R.id.welcomeTextView)
-        welcomeMessage.text = "Welcome, $username!"
 
         homeIcon.setOnClickListener {
             val intent = Intent(this, WelcomeActivity::class.java)

@@ -22,10 +22,6 @@ class Createalbum : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_createalbum)
 
-        val username = intent.getStringExtra("username")
-        val welcomeMessage = findViewById<TextView>(R.id.welcomeTextView)
-        welcomeMessage.text = "Welcome, $username!"
-
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
         createIcon = findViewById(R.id.image)

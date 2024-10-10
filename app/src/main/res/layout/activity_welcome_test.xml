@@ -19,6 +19,7 @@
             android:layout_marginTop="16dp"
             android:textSize="35dp"
             android:textStyle="bold"
+            android:textColor="#FF000000"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -82,7 +83,7 @@
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:background="@color/lightergreen"
+            android:background="@drawable/border_bg"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 

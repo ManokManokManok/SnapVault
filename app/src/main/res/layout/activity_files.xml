@@ -11,54 +11,29 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/white">
 
         <TextView
-            android:id="@+id/welcomeTextView"
+            android:id="@+id/files"
+            android:text="All Files"
             android:layout_width="400dp"
             android:layout_height="60dp"
             android:layout_marginTop="16dp"
             android:textSize="35dp"
             android:textStyle="bold"
+            android:textColor="#FF000000"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/bg"
-            android:layout_width="422dp"
-            android:layout_height="300dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="60dp"
-            android:background="@drawable/bg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.523"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.224" />
-
-        <ImageView
-            android:id="@+id/bg2"
-            android:layout_width="422dp"
-            android:layout_height="300dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="60dp"
-            android:background="@drawable/bg"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.523"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.799" />
 
         <EditText
             android:id="@+id/search_bar"
             android:layout_width="310dp"
             android:layout_height="50dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="30dp"
-            android:layout_marginStart="40dp"
+            android:layout_marginStart="10dp"
             android:padding="15dp"
             android:fontFamily="@font/fredoka_regular"
             android:background="@drawable/semi_circle_corner"
@@ -66,25 +41,84 @@
             android:textColor="@color/black"
             android:textColorHint="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/welcomeTextView" />
+            app:layout_constraintTop_toBottomOf="@id/files" />
+
+        <TextView
+            android:id="@+id/albums"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Albums"
+            android:textStyle="bold"
+            android:textColor="#FF000000"
+            android:textSize="30dp"
+            app:layout_constraintTop_toBottomOf="@+id/search_bar"
+            android:layout_margin="10dp"/>
 
         <TextView
             android:id="@+id/usernameicon"
             android:layout_width="60dp"
             android:layout_height="50dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="340dp"
             android:background="@drawable/semi_circle_left"
             android:drawableLeft="@drawable/imagesearch_icon"
             android:padding="15dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/welcomeTextView" />
+            app:layout_constraintTop_toBottomOf="@id/files" />
+
+        <!-- Album 1 (Baguio City) -->
+        <ImageView
+            android:id="@+id/firstalbum"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/magic"
+            android:backgroundTint="@android:color/holo_green_light"
+            app:layout_constraintTop_toBottomOf="@id/albums"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/tvfirstialbum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Magic Sarap"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toBottomOf="@id/firstalbum"
+            app:layout_constraintStart_toStartOf="@id/firstalbum"
+            android:layout_marginTop="8dp"/>
+
+        <!-- Album 2 (Animals) -->
+        <ImageView
+            android:id="@+id/ivAnimals"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/indian"
+            android:backgroundTint="@android:color/holo_green_light"
+            app:layout_constraintTop_toBottomOf="@id/albums"
+            app:layout_constraintStart_toEndOf="@id/firstalbum"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/tvAnimals"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Hello World"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintTop_toBottomOf="@id/ivAnimals"
+            app:layout_constraintStart_toStartOf="@id/ivAnimals"
+            android:layout_marginTop="8dp"/>
 
         <ImageView
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:background="@drawable/border_background"
+            android:background="@drawable/border_bg"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
