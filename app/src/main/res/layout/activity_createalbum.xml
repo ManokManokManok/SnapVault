@@ -171,7 +171,7 @@
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:background="@drawable/border_background"
+            android:background="@drawable/border_bg"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -179,31 +179,33 @@
             android:id="@+id/home"
             android:layout_width="51dp"
             android:layout_height="46dp"
-            android:background="@drawable/ic_home"
+            android:src="@drawable/ic_home"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="30dp" />
+            android:layout_marginStart="30dp"
+            />
 
         <ImageView
             android:id="@+id/folder"
             android:layout_width="51dp"
             android:layout_height="46dp"
-            android:background="@drawable/ic_folder"
+            android:src="@drawable/ic_folder"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/home"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="60dp" />
+            android:layout_marginStart="50dp" />
 
         <ImageView
-            android:id="@+id/image"
-            android:layout_width="51dp"
+            android:id="@+id/create"
+            android:layout_width="50dp"
             android:layout_height="46dp"
-            android:background="@drawable/create_icon"
+            android:src="@drawable/create_icon"
+            android:background="@drawable/navbar_icon_selected_background"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/folder"
+            app:layout_constraintEnd_toStartOf="@id/person"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="60dp" />
+            android:layout_marginEnd="50dp" />
 
         <ImageView
             android:id="@+id/person"
@@ -211,9 +213,9 @@
             android:layout_height="46dp"
             android:background="@drawable/ic_person"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/image"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="60dp" />
+            android:layout_marginEnd="30dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -91,11 +91,13 @@
             android:id="@+id/home"
             android:layout_width="51dp"
             android:layout_height="46dp"
-            android:background="@drawable/ic_home"
+            android:src="@drawable/ic_home"
+            android:background="@drawable/navbar_icon_selected_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="30dp" />
+            android:layout_marginStart="30dp"
+            />
 
         <ImageView
             android:id="@+id/folder"
@@ -105,7 +107,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/home"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="60dp" />
+            android:layout_marginStart="50dp" />
 
         <ImageView
             android:id="@+id/create"
@@ -113,9 +115,9 @@
             android:layout_height="46dp"
             android:background="@drawable/create_icon"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/folder"
+            app:layout_constraintEnd_toStartOf="@id/person"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="60dp" />
+            android:layout_marginEnd="50dp" />
 
         <ImageView
             android:id="@+id/person"
@@ -123,9 +125,9 @@
             android:layout_height="46dp"
             android:background="@drawable/ic_person"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/create"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="60dp" />
+            android:layout_marginEnd="30dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
