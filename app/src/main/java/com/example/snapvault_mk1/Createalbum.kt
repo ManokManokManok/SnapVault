@@ -24,15 +24,15 @@ class Createalbum : AppCompatActivity() {
 
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
-        createIcon = findViewById(R.id.image)
+        createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
         closeUpButton = findViewById(R.id.close_upbutton)
 
 
-        findViewById<View>(R.id.welcomebox).translationY = 1000f
+        findViewById<View>(R.id.welcomebox).translationY = 700f
         findViewById<View>(R.id.albumname).translationY = 1000f
         findViewById<View>(R.id.cancelbutton).translationY = 1000f
-        findViewById<View>(R.id.close_upbutton).translationY = 1000f
+        findViewById<View>(R.id.close_upbutton).translationY = 700f
         findViewById<View>(R.id.createbutton).translationY = 1000f
 
         // Set onClickListener for icons
@@ -75,10 +75,10 @@ class Createalbum : AppCompatActivity() {
 
     private fun collapseViews() {
 
-        animateView(R.id.welcomebox, 1000f)
+        animateView(R.id.welcomebox, 700f)
         animateView(R.id.albumname, 1000f)
         animateView(R.id.cancelbutton, 1000f)
-        animateView(R.id.close_upbutton, 1000f)
+        animateView(R.id.close_upbutton, 700f)
         animateView(R.id.createbutton, 1000f)
     }
 

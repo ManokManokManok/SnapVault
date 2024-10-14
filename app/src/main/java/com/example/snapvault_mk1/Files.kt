@@ -22,17 +22,16 @@ class Files : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
 
         // Retrieve the stored username from SharedPreferences
-        val username = intent.getStringExtra("username") ?: sharedPreferences.getString("username", null)
+        val username = sharedPreferences.getString("username", null)
 
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
-        createIcon = findViewById(R.id.image)
+        createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
 
         homeIcon.setOnClickListener {
             // Navigate back to WelcomeActivity, passing the username
             val intent = Intent(this, WelcomeActivity::class.java)
-            intent.putExtra("username", username)
             startActivity(intent)
         }
 

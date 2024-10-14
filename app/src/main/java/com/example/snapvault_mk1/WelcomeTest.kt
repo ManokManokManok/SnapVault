@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import android.content.SharedPreferences
+import android.util.Log
 
 class WelcomeActivity : AppCompatActivity() {
 
@@ -41,17 +43,29 @@ class WelcomeActivity : AppCompatActivity() {
         // Set up click listeners for the icons
         fileIcon.setOnClickListener {
             val intent = Intent(this, Files::class.java)
+            Log.d("Intent", "Intent created to launch FilesActivity")
+            Toast.makeText(this, "Intent created to launch FilesActivity", Toast.LENGTH_SHORT).show()
             startActivity(intent)
         }
 
         createIcon.setOnClickListener {
             val intent = Intent(this, Createalbum::class.java)
+            Log.d("Intent", "Intent created to launch CreatealbumActivity")
+            Toast.makeText(this, "Intent created to launch CreatealbumActivity", Toast.LENGTH_SHORT).show()
             startActivity(intent)
         }
 
         personIcon.setOnClickListener {
             val intent = Intent(this, User::class.java)
+            Log.d("Intent", "Intent created to launch UserActivity")
+            Toast.makeText(this, "Intent created to launch UserActivity", Toast.LENGTH_SHORT).show()
             startActivity(intent)
+        }
+
+        // Check if the username is stored correctly
+        if (username != null) {
+            Log.d("SharedPreferences", "Username stored: $username")
+            Toast.makeText(this, "Username stored: $username", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -60,5 +74,7 @@ class WelcomeActivity : AppCompatActivity() {
         val editor = sharedPreferences.edit()
         editor.putString("username", username)
         editor.apply() // Commit the changes to SharedPreferences
+        Log.d("SharedPreferences", "Username saved: $username")
+        Toast.makeText(this, "Username saved: $username", Toast.LENGTH_SHORT).show()
     }
 }

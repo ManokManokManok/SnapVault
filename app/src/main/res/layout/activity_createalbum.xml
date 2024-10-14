@@ -31,7 +31,6 @@
             android:id="@+id/albumname"
             android:layout_width="400dp"
             android:layout_height="60dp"
-            android:layout_marginStart="28dp"
             android:layout_marginBottom="260dp"
             android:background="@drawable/circle_corner"
             android:gravity="center"
@@ -43,7 +42,8 @@
             android:textStyle="bold"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
             android:id="@+id/cancelbutton"
@@ -64,12 +64,12 @@
             android:id="@+id/close_upbutton"
             android:layout_width="100dp"
             android:layout_height="30dp"
-            android:layout_marginStart="172dp"
             android:layout_marginBottom="412dp"
             android:backgroundTint="@color/darkgreen"
             android:gravity="center_horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
             android:id="@+id/createbutton"
