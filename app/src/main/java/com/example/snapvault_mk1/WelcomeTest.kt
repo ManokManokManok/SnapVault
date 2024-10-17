@@ -23,58 +23,55 @@ class WelcomeActivity : AppCompatActivity() {
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
 
-        // Retrieve the intent data or SharedPreferences
+        // Retrieve the intent data
         val username = intent.getStringExtra("username") ?: sharedPreferences.getString("username", null)
         val id = intent.getIntExtra("id", -1)
+        val email = intent.getStringExtra("email") ?: sharedPreferences.getString("email", null)
 
-        // If the username is available, save it to SharedPreferences
-        if (username != null) {
-            saveUsername(username)
-        }
+        // Save username and email if they are available
+        username?.let { saveUsername(it) }
+        email?.let { saveEmail(it) }
 
+        // Set up the UI components
         fileIcon = findViewById(R.id.folder)
         createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
 
-        // Display the username on the WelcomeActivity
+        // Display the welcome message
         val welcomeMessage = findViewById<TextView>(R.id.welcomeTextView)
-        welcomeMessage.text = "Welcome, ${username ?: "Guest"}" // If username is null, display "Guest"
+        welcomeMessage.text = "Welcome, ${username ?: "Guest"}"
 
-        // Set up click listeners for the icons
+        // Click listeners for the icons
         fileIcon.setOnClickListener {
-            val intent = Intent(this, Files::class.java)
-            Log.d("Intent", "Intent created to launch FilesActivity")
-            Toast.makeText(this, "Intent created to launch FilesActivity", Toast.LENGTH_SHORT).show()
-            startActivity(intent)
+            startActivity(Intent(this, Files::class.java))
         }
-
         createIcon.setOnClickListener {
-            val intent = Intent(this, Createalbum::class.java)
-            Log.d("Intent", "Intent created to launch CreatealbumActivity")
-            Toast.makeText(this, "Intent created to launch CreatealbumActivity", Toast.LENGTH_SHORT).show()
-            startActivity(intent)
+            startActivity(Intent(this, Createalbum::class.java))
         }
-
         personIcon.setOnClickListener {
-            val intent = Intent(this, User::class.java)
-            Log.d("Intent", "Intent created to launch UserActivity")
-            Toast.makeText(this, "Intent created to launch UserActivity", Toast.LENGTH_SHORT).show()
-            startActivity(intent)
+            startActivity(Intent(this, User::class.java))
         }
 
-        // Check if the username is stored correctly
-        if (username != null) {
-            Log.d("SharedPreferences", "Username stored: $username")
-            Toast.makeText(this, "Username stored: $username", Toast.LENGTH_SHORT).show()
-        }
+        // Logging for debugging
+        username?.let { Log.d("SharedPreferences", "Username stored: $it") }
+        email?.let { Log.d("SharedPreferences", "Email stored: $it") }
     }
 
-    // Function to save username in SharedPreferences
+    // Save username in SharedPreferences
     private fun saveUsername(username: String) {
         val editor = sharedPreferences.edit()
         editor.putString("username", username)
-        editor.apply() // Commit the changes to SharedPreferences
+        editor.apply()
         Log.d("SharedPreferences", "Username saved: $username")
         Toast.makeText(this, "Username saved: $username", Toast.LENGTH_SHORT).show()
+    }
+
+    // Save email in SharedPreferences
+    private fun saveEmail(email: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString("email", email)
+        editor.apply()
+        Log.d("SharedPreferences", "Email saved: $email")
+        Toast.makeText(this, "Email saved: $email", Toast.LENGTH_SHORT).show() // Added Toast message
     }
 }

@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.content.SharedPreferences
+import android.widget.Button
 
 class User : AppCompatActivity() {
 
@@ -13,6 +14,7 @@ class User : AppCompatActivity() {
     private lateinit var fileIcon: ImageView
     private lateinit var createIcon: ImageView
     private lateinit var personIcon: ImageView
+    private lateinit var emailsettings: Button
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,12 +27,14 @@ class User : AppCompatActivity() {
 
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
-        createIcon = findViewById(R.id.image)
+        createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
+        emailsettings = findViewById(R.id.emailsettings)
+
 
         // Display the username in the TextView
         val welcomeMessage = findViewById<TextView>(R.id.welcomeTextView)
-        welcomeMessage.text = "Welcome, $username!"
+        welcomeMessage.text = "Settings for \n $username!"
 
         // Set onClickListeners for the icons
         homeIcon.setOnClickListener {
@@ -56,5 +60,12 @@ class User : AppCompatActivity() {
             intent.putExtra("username", username)
             startActivity(intent)
         }
+
+        emailsettings.setOnClickListener {
+            val intent = Intent(this, Settings_Email::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+        }
+
     }
 }
