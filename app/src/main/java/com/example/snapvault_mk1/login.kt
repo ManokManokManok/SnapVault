@@ -166,6 +166,7 @@ class Login : AppCompatActivity() {
                         intent.putExtra("username", username)
                         intent.putExtra("id", id)
                         intent.putExtra("email", email)
+                        intent.putExtra("password", password)
                         startActivity(intent)
                     } else {
                         Toast.makeText(this@Login, "Login failed: ${jsonObject.getString("message")}", Toast.LENGTH_SHORT).show()

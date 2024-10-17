@@ -16,7 +16,10 @@ class User : AppCompatActivity() {
     private lateinit var personIcon: ImageView
     private lateinit var emailsettings: Button
     private lateinit var usernamesettings: Button
+    private lateinit var passwordsettings: Button
+    private lateinit var logoutbutton: Button
     private lateinit var sharedPreferences: SharedPreferences
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +35,8 @@ class User : AppCompatActivity() {
         personIcon = findViewById(R.id.person)
         emailsettings = findViewById(R.id.emailsettings)
         usernamesettings = findViewById(R.id.usernamesettings)
+        passwordsettings = findViewById(R.id.passwordsettings)
+        logoutbutton = findViewById(R.id.logoutbutton)
 
 
         // Display the username in the TextView
@@ -75,6 +80,19 @@ class User : AppCompatActivity() {
             startActivity(intent)
         }
 
+        passwordsettings.setOnClickListener {
+            val intent = Intent(this, Settings_Password::class.java)
+            startActivity(intent)
+        }
+
+        logoutbutton.setOnClickListener {
+            // Clear SharedPreferences
+            sharedPreferences.edit().clear().apply()
+            // Start the StartPage activity
+            val intent = Intent(this, StartPage::class.java)
+            startActivity(intent)
+            finish() // Optional: Call finish() to remove this activity from the back stack
+        }
 
 
 

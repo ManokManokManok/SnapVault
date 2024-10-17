@@ -27,10 +27,12 @@ class WelcomeActivity : AppCompatActivity() {
         val username = intent.getStringExtra("username") ?: sharedPreferences.getString("username", null)
         val id = intent.getIntExtra("id", -1)
         val email = intent.getStringExtra("email") ?: sharedPreferences.getString("email", null)
+        val password = intent.getStringExtra("password") ?: sharedPreferences.getString("password", null)
 
         // Save username and email if they are available
         username?.let { saveUsername(it) }
         email?.let { saveEmail(it) }
+        password?.let { savePassword(it) }
 
         // Set up the UI components
         fileIcon = findViewById(R.id.folder)
@@ -55,6 +57,7 @@ class WelcomeActivity : AppCompatActivity() {
         // Logging for debugging
         username?.let { Log.d("SharedPreferences", "Username stored: $it") }
         email?.let { Log.d("SharedPreferences", "Email stored: $it") }
+        password?.let { Log.d("SharedPreferences", "Password Stored: $it") }
     }
 
     // Save username in SharedPreferences
@@ -73,5 +76,13 @@ class WelcomeActivity : AppCompatActivity() {
         editor.apply()
         Log.d("SharedPreferences", "Email saved: $email")
         Toast.makeText(this, "Email saved: $email", Toast.LENGTH_SHORT).show() // Added Toast message
+    }
+
+    private fun savePassword(password: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString("password", password)
+        editor.apply()
+        Log.d("SharedPreferences", "Password saved: $password")
+        Toast.makeText(this, "Password saved: $password", Toast.LENGTH_SHORT).show() // Added Toast message
     }
 }

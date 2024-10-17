@@ -15,8 +15,7 @@
         <TextView
             android:id="@+id/welcomeTextView"
             android:layout_width="400dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="16dp"
+            android:layout_height="80dp"
             android:textSize="35dp"
             android:textStyle="bold"
             android:textColor="#FF000000"
