@@ -15,6 +15,7 @@ class User : AppCompatActivity() {
     private lateinit var createIcon: ImageView
     private lateinit var personIcon: ImageView
     private lateinit var emailsettings: Button
+    private lateinit var usernamesettings: Button
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +31,7 @@ class User : AppCompatActivity() {
         createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
         emailsettings = findViewById(R.id.emailsettings)
+        usernamesettings = findViewById(R.id.usernamesettings)
 
 
         // Display the username in the TextView
@@ -66,6 +68,15 @@ class User : AppCompatActivity() {
             intent.putExtra("username", username)
             startActivity(intent)
         }
+
+        usernamesettings.setOnClickListener {
+            val intent = Intent(this, Settings_Username::class.java)
+            intent.putExtra("username", username)
+            startActivity(intent)
+        }
+
+
+
 
     }
 }

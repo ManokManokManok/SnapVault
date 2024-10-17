@@ -29,7 +29,7 @@
             android:layout_width="400dp"
             android:layout_height="90dp"
             android:layout_marginTop="16dp"
-            android:text="Settings for \n TestingAccount"
+            android:text="Settings for \n (insert username)"
             android:gravity="center"
             android:textSize="35dp"
             android:textStyle="bold"
@@ -62,7 +62,7 @@
             app:layout_constraintTop_toTopOf="@id/emailsettings"/>
 
         <Button
-            android:id="@+id/blank2"
+            android:id="@+id/usernamesettings"
             android:layout_width="350dp"
             android:layout_height="60dp"
             android:layout_marginTop="20dp"
@@ -80,8 +80,8 @@
             android:layout_height="60dp"
             android:drawableLeft="@drawable/user_icon"
             android:padding="10dp"
-            app:layout_constraintStart_toStartOf="@id/blank2"
-            app:layout_constraintTop_toTopOf="@id/blank2" />
+            app:layout_constraintStart_toStartOf="@id/usernamesettings"
+            app:layout_constraintTop_toTopOf="@id/usernamesettings" />
 
         <Button
             android:id="@+id/blank3"
@@ -92,7 +92,7 @@
             android:textColor="@color/black"
             android:textSize="25sp"
             android:backgroundTint="#D9FFB3"
-            app:layout_constraintTop_toBottomOf="@id/blank2"
+            app:layout_constraintTop_toBottomOf="@id/usernamesettings"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

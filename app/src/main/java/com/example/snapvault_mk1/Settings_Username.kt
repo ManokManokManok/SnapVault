@@ -21,26 +21,26 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
-interface ChangeEmailApi {
+interface ChangeUsernameApi {
     @FormUrlEncoded
-    @POST("change_email.php") // DITO YUNG API NATIN ALAM MO NA YAN DAPAT
-    fun changeEmail(
-        @Field("current_email") currentEmail: String,
-        @Field("new_email") newEmail: String
+    @POST("change_username.php") // Ensure this matches your PHP file location
+    fun changeUsername(
+        @Field("current_username") currentUsername: String,
+        @Field("new_username") newUsername: String
     ): Call<ResponseBody>
 }
 
-class Settings_Email : AppCompatActivity() {
+class Settings_Username : AppCompatActivity() {
     private var isPopupShown = false
     private lateinit var sharedPreferences: SharedPreferences
-    private var accountEmail: String? = null
+    private var accountUsername: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_settings_email)
+        setContentView(R.layout.activity_settings_username)
 
-       //EDGE TO EDGE SUPP NATEN (SEARCH MO NALANG KUNG DI KA SURE)
+        // Handle window insets for edge-to-edge support
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -48,15 +48,13 @@ class Settings_Email : AppCompatActivity() {
         }
 
         sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
-        accountEmail = sharedPreferences.getString("email", null)
+        accountUsername = sharedPreferences.getString("username", null)
 
         val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
         val popup = listOf<View>(
             findViewById(R.id.background),
-            findViewById(R.id.curremail),
-            findViewById(R.id.newemail),
-            findViewById(R.id.emailicon),
-            findViewById(R.id.passicon),
+            findViewById(R.id.curruser),
+            findViewById(R.id.newuser),
             findViewById(R.id.confirmbutton),
             findViewById(R.id.back)
         )
@@ -67,34 +65,32 @@ class Settings_Email : AppCompatActivity() {
             startActivity(Intent(this, User::class.java))
         }
 
-
-
-        // ALAM MO NA DAPAT TO JUSKO LAGING GINAGAMIT
+        // Initially hide all popup views
         popup.forEach { it.visibility = View.GONE }
 
-
+        // Show popup if it hasn't been shown yet
         if (!isPopupShown) {
             showPopup(popup, heightOfScreen)
             isPopupShown = true
         }
 
         val confirmButton = findViewById<Button>(R.id.confirmbutton)
-        val currentEmailInput = findViewById<EditText>(R.id.curremail)
-        val newEmailInput = findViewById<EditText>(R.id.newemail)
+        val currentUsernameInput = findViewById<EditText>(R.id.curruser)
+        val newUsernameInput = findViewById<EditText>(R.id.newuser)
 
-        // CLICK LISTENER NUNG CONFIRM BUTTON
+        // Set onClickListener for the confirm button
         confirmButton.setOnClickListener {
-            val currentEmail = currentEmailInput.text.toString().trim()
-            val newEmail = newEmailInput.text.toString().trim()
+            val currentUsername = currentUsernameInput.text.toString().trim()
+            val newUsername = newUsernameInput.text.toString().trim()
 
-            // ITO NAG CHE CHECK KUNG YUNG NILAGAY NA EMAIL IS MATCH DUN SA ACCOUNT EMAIL NI USER
-            if (currentEmail != accountEmail) {
-                Toast.makeText(this, "Current email does not match your account.", Toast.LENGTH_SHORT).show()
+            // Validate that the current username matches the account username
+            if (currentUsername != accountUsername) {
+                Toast.makeText(this, "Current username does not match your account.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // MAKES SURE NA CHAKA LANG IIBAHIN PAG VALID
-            changeEmail(currentEmail, newEmail)
+            // Change username if the current username is valid
+            changeUsername(currentUsername, newUsername)
         }
     }
 
@@ -111,45 +107,48 @@ class Settings_Email : AppCompatActivity() {
         }
     }
 
-    private fun changeEmail(currentEmail: String, newEmail: String) {
-        // CHECKING KUNG MAY LAMAN YUNG NEW EMAIL FIELD
-        if (newEmail.isEmpty()) {
+    private fun changeUsername(currentUsername: String, newUsername: String) {
+        // Check if the new username is not empty
+        if (newUsername.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // RETROFIT NATIN (!!WAG GAGALAWIN KUNG DI KAILANGAN!!)
+        // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // IBAHIN AS NEEDED TO
+            .baseUrl("http://10.0.2.2/") // Ensure this matches your local server
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        val changeEmailApi = retrofit.create(ChangeEmailApi::class.java)
+        val changeUsernameApi = retrofit.create(ChangeUsernameApi::class.java)
 
-        // NETWORK CALLING PRA IBAHIN YUNG EMAIL
-        changeEmailApi.changeEmail(currentEmail, newEmail).enqueue(object : Callback<ResponseBody> {
+        // Make the network call to change the username
+        changeUsernameApi.changeUsername(currentUsername, newUsername).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     response.body()?.let { responseBody ->
                         val responseMessage = responseBody.string() // Get the response from the PHP file
-                        Toast.makeText(this@Settings_Email, responseMessage, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@Settings_Username, responseMessage, Toast.LENGTH_SHORT).show()
 
-                        // ITO NAG CHE CHECK KUNG SUCCESS AND IF SO BALIK SA LOGIN
-                        if (responseMessage.contains("Email changed successfully", ignoreCase = true)) {
-                            // Navigate back to the login page
-                            startActivity(Intent(this@Settings_Email, Login::class.java))
-                            finish()
+                        // Check if the response indicates a successful username change
+                        if (responseMessage.contains("success", ignoreCase = true)) { // Adjust this condition based on your PHP response
+                            // Update SharedPreferences with the new username
+                            sharedPreferences.edit().putString("username", newUsername).apply()
+
+                            // Navigate back to Login screen
+                            startActivity(Intent(this@Settings_Username, Login::class.java)) // Replace with actual LoginActivity name
+                            finish() // Optional: finish this activity so it doesn't remain in the back stack
                         }
                     } ?: run {
-                        Toast.makeText(this@Settings_Email, "Unexpected error occurred.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@Settings_Username, "Unexpected error occurred.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    Toast.makeText(this@Settings_Email, "Failed to change email: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@Settings_Username, "Failed to change username: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Toast.makeText(this@Settings_Email, "Network failure. Please try again.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@Settings_Username, "Network failure. Please try again.", Toast.LENGTH_SHORT).show()
             }
         })
     }

@@ -23,7 +23,7 @@
         android:layout_width="400dp"
         android:layout_height="90dp"
         android:layout_marginTop="16dp"
-        android:text="Would you like to change your email?"
+        android:text="Would you like to change your username?"
         android:gravity="center"
         android:textSize="35dp"
         android:textStyle="bold"
@@ -41,7 +41,7 @@
         app:layout_constraintTop_toBottomOf="@id/welcomeTextView" />
 
     <EditText
-        android:id="@+id/curremail"
+        android:id="@+id/curruser"
         android:layout_width="290dp"
         android:layout_height="67dp"
         android:layout_marginTop="50dp"
@@ -49,28 +49,28 @@
         android:ems="10"
         android:fontFamily="@font/fredoka_regular"
         android:textSize="25sp"
-        android:hint="Current Email"
+        android:hint="Current Username"
         android:inputType="text"
         android:padding="10dp"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        app:layout_constraintStart_toEndOf="@id/emailicon"
+        app:layout_constraintStart_toEndOf="@id/usericon"
         app:layout_constraintTop_toBottomOf="@id/welcomeTextView"/>
 
     <TextView
-        android:id="@+id/emailicon"
+        android:id="@+id/usericon"
         android:layout_width="60dp"
         android:layout_height="67dp"
         android:layout_marginStart="32dp"
         android:background="@drawable/semi_circle_left"
-        android:drawableLeft="@drawable/email_icon"
+        android:drawableLeft="@drawable/user_icon"
         android:padding="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/curremail"
-        app:layout_constraintEnd_toStartOf="@id/curremail"/>
+        app:layout_constraintTop_toTopOf="@id/curruser"
+        app:layout_constraintEnd_toStartOf="@id/curruser"/>
 
     <EditText
-        android:id="@+id/newemail"
+        android:id="@+id/newuser"
         android:layout_width="290dp"
         android:layout_height="67dp"
         android:layout_marginTop="25dp"
@@ -78,13 +78,13 @@
         android:ems="10"
         android:fontFamily="@font/fredoka_regular"
         android:textSize="25sp"
-        android:hint="New Email"
+        android:hint="New Username"
         android:inputType="text"
         android:padding="10dp"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        app:layout_constraintStart_toEndOf="@id/emailicon"
-        app:layout_constraintTop_toBottomOf="@id/curremail"/>
+        app:layout_constraintStart_toEndOf="@id/usericon"
+        app:layout_constraintTop_toBottomOf="@id/curruser"/>
 
     <TextView
         android:id="@+id/passicon"
@@ -93,8 +93,8 @@
         android:background="@drawable/semi_circle_left"
         android:drawableLeft="@drawable/pass_icon"
         android:padding="10dp"
-        app:layout_constraintEnd_toStartOf="@id/newemail"
-        app:layout_constraintTop_toTopOf="@id/newemail" />
+        app:layout_constraintEnd_toStartOf="@id/newuser"
+        app:layout_constraintTop_toTopOf="@id/newuser" />
 
     <Button
         android:id="@+id/confirmbutton"
@@ -108,7 +108,7 @@
         android:fontFamily="@font/fredoka_regular"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newemail" />
+        app:layout_constraintTop_toBottomOf="@+id/newuser" />
 
     <Button
         android:id="@+id/back"
