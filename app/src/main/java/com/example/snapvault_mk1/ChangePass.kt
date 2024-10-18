@@ -32,6 +32,8 @@ interface ChangePassApi {
 class ChangePass : AppCompatActivity() {
     private var isPopupShown = false
     private lateinit var storedEmail: String // Store the passed email
+    private var backPressedTime: Long = 0
+    private val backPressedDelay: Long = 3000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,6 +100,20 @@ class ChangePass : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (backPressedTime + backPressedDelay > System.currentTimeMillis()) {
+            // Navigate back to another activity instead of closing the app
+            val intent = Intent(this, Login::class.java) // Replace with your target activity
+            startActivity(intent)
+            finish() // Optional: finish the current activity if you want to remove it from the back stack
+            return
+        } else {
+            // Show a toast message for the first back press
+            Toast.makeText(this, "Press back again to go back to Sign in", Toast.LENGTH_SHORT).show()
+        }
+        backPressedTime = System.currentTimeMillis()
+    }
+
     private fun changePassword(email: String, newPassword: String) {
         // Check if the email and new password are not empty
         if (email.isEmpty() || newPassword.isEmpty()) {
@@ -107,7 +123,7 @@ class ChangePass : AppCompatActivity() {
 
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/") // Ensure this matches your local server
+            .baseUrl("http://192.168.1.11/") // Ensure this matches your local server
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

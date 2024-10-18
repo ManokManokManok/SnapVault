@@ -30,9 +30,10 @@ class Files : AppCompatActivity() {
         personIcon = findViewById(R.id.person)
 
         homeIcon.setOnClickListener {
-            // Navigate back to WelcomeActivity, passing the username
+            // Navigate back to WelcomeActivity
             val intent = Intent(this, WelcomeActivity::class.java)
             startActivity(intent)
+            finish() // Optional: Finish Files activity
         }
 
         createIcon.setOnClickListener {
@@ -45,4 +46,14 @@ class Files : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    // Override the onBackPressed method
+    override fun onBackPressed() {
+        // Navigate back to WelcomeActivity
+        val intent = Intent(this, WelcomeActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish() // Optional: Finish the current activity to remove it from the back stack
+    }
+
 }

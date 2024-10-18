@@ -114,6 +114,15 @@ class signup : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        // Navigate back to WelcomeActivity
+        val intent = Intent(this, StartPage::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish() // Optional: Finish the current activity to remove it from the back stack
+    }
+
+
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
         popupViews.forEach { view ->
             view.visibility = View.VISIBLE
@@ -142,7 +151,7 @@ class signup : AppCompatActivity() {
 
     private fun sendSignupData(email: String, username: String, password: String) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/") // ILAGAY MO IP ADDRESS MO HA
+            .baseUrl("http://192.168.1.11/") // ILAGAY MO IP ADDRESS MO HA
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

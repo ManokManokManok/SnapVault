@@ -1,6 +1,7 @@
 package com.example.snapvault_mk1
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.MotionEvent
@@ -9,7 +10,6 @@ import android.text.InputType
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.snapvault_mk1.ApiService
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
@@ -23,10 +23,10 @@ import android.util.Log
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 
-
+// API interface for login
 interface LoginApi {
     @FormUrlEncoded
-    @POST("login.php")
+    @POST("login.php") // Your actual PHP endpoint
     fun login(
         @Field("email") email: String,
         @Field("password") password: String
@@ -35,53 +35,56 @@ interface LoginApi {
 
 class Login : AppCompatActivity() {
     private var isPopupShown = false
-
     private lateinit var emailEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
-    private lateinit var signunButton: Button
+    private lateinit var signUpButton: Button
+    private lateinit var forgotPassButton: Button
     private var isPasswordVisible = false
+
+    // SharedPreferences to save user details
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
+
         // Initialize the views
         emailEditText = findViewById(R.id.username)
         passwordEditText = findViewById(R.id.password)
         loginButton = findViewById(R.id.loginButton)
-        signunButton = findViewById(R.id.signup)
-
-        val forgotpass = findViewById<Button>(R.id.forgetpass)
-
-        val main = findViewById<ConstraintLayout>(R.id.main)
+        signUpButton = findViewById(R.id.signup)
+        forgotPassButton = findViewById(R.id.forgetpass)
+        val mainLayout = findViewById<ConstraintLayout>(R.id.main)
         val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
 
-        val popup = listOf<View>(
+        // Handle popup visibility
+        val popupViews = listOf<View>(
             findViewById(R.id.background),
             findViewById(R.id.username),
             findViewById(R.id.usernameicon),
             findViewById(R.id.password),
             findViewById(R.id.passicon),
-            findViewById(R.id.forgetpass),
-            findViewById(R.id.loginButton),
+            forgotPassButton,
+            loginButton,
             findViewById(R.id.dhac),
-            findViewById(R.id.signup)
-
+            signUpButton
         )
 
-        popup.forEach { it.visibility = View.GONE }
+        popupViews.forEach { it.visibility = View.GONE }
 
         if (!isPopupShown) {
-            showPopup(popup, heightOfScreen)
+            showPopup(popupViews, heightOfScreen)
             isPopupShown = true
         }
 
         // Handle password visibility toggle
         passwordEditText.setOnTouchListener { v, event ->
-            val DRAWABLE_RIGHT = 2
             if (event.action == MotionEvent.ACTION_UP) {
-                if (event.rawX >= (passwordEditText.right - passwordEditText.compoundDrawables[DRAWABLE_RIGHT].bounds.width())) {
+                if (event.rawX >= (passwordEditText.right - passwordEditText.compoundDrawables[2].bounds.width())) {
                     togglePasswordVisibility()
                     return@setOnTouchListener true
                 }
@@ -101,16 +104,25 @@ class Login : AppCompatActivity() {
             }
         }
 
-        signunButton.setOnClickListener {
+        // Navigate to signup activity
+        signUpButton.setOnClickListener {
             val intent = Intent(this, signup::class.java)
             startActivity(intent)
         }
 
-        forgotpass.setOnClickListener {
+        // Navigate to forgot password activity
+        forgotPassButton.setOnClickListener {
             val intent = Intent(this, ForgotPass::class.java)
             startActivity(intent)
         }
+    }
 
+    override fun onBackPressed() {
+        // Navigate back to StartPage
+        val intent = Intent(this, StartPage::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish() // Optional: Finish the current activity to remove it from the back stack
     }
 
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
@@ -126,7 +138,6 @@ class Login : AppCompatActivity() {
         }
     }
 
-    // Function to toggle password visibility
     private fun togglePasswordVisibility() {
         if (isPasswordVisible) {
             passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
@@ -142,33 +153,40 @@ class Login : AppCompatActivity() {
     // Function to send login data to the server
     private fun sendLoginData(email: String, password: String) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/")
+            .baseUrl("http://192.168.1.11/") // Replace with your server's IP
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        val LoginApi = retrofit.create(LoginApi::class.java)
-        LoginApi.login(email, password).enqueue(object : Callback<ResponseBody> {
+        val loginApi = retrofit.create(LoginApi::class.java)
+        loginApi.login(email, password).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
-
                 if (response.isSuccessful) {
-                    val jsonResponse = response.body()?.string() ?:return
+                    val jsonResponse = response.body()?.string() ?: return
                     Log.d("LoginResponse", "Response JSON: $jsonResponse")
                     val jsonObject = JSONObject(jsonResponse)
                     val status = jsonObject.getString("status")
 
                     if (status == "success") {
                         val username = jsonObject.getString("username")
-                        val id = jsonObject.getInt("id")
+                        val id = jsonObject.getInt("id") // Get id from PHP response
+
+                        // Save login state in SharedPreferences
+                        val editor = sharedPreferences.edit()
+                        editor.putBoolean("is_logged_in", true)
+                        editor.putString("username", username)
+                        editor.putInt("user_id", id) // Save as user_id
+                        editor.apply()
 
                         Toast.makeText(this@Login, "Hello, $username!", Toast.LENGTH_SHORT).show()
 
+                        // Start WelcomeActivity with user details
                         val intent = Intent(this@Login, WelcomeActivity::class.java)
                         intent.putExtra("username", username)
-                        intent.putExtra("id", id)
-                        intent.putExtra("email", email)
-                        intent.putExtra("password", password)
+                        intent.putExtra("user_id", id) // Pass user_id to WelcomeActivity
+                        intent.putExtra("email", email) // Assuming email is needed in WelcomeActivity
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         startActivity(intent)
+                        finish() // Close Login activity
                     } else {
                         Toast.makeText(this@Login, "Login failed: ${jsonObject.getString("message")}", Toast.LENGTH_SHORT).show()
                     }

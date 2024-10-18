@@ -80,6 +80,15 @@ class ForgotPass : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        // Navigate back to WelcomeActivity
+        val intent = Intent(this, Login::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish() // Optional: Finish the current activity to remove it from the back stack
+    }
+
+
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
         popupViews.forEach { view ->
             view.visibility = View.VISIBLE
@@ -98,7 +107,7 @@ class ForgotPass : AppCompatActivity() {
         Toast.makeText(this, "Sending email...", Toast.LENGTH_SHORT).show()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/") // Replace with your actual IP address or base URL
+            .baseUrl("http://192.168.1.11/") // Replace with your actual IP address or base URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

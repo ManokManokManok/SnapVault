@@ -10,6 +10,7 @@ import android.view.animation.TranslateAnimation
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.VideoView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,8 @@ import androidx.core.view.WindowInsetsCompat
 
 class StartPage : AppCompatActivity() {
     private var isPopupShown = false // Flag to check if the popup is shown
+    private var backPressedTime: Long = 0
+    private val backPressedDelay: Long = 3000 // 3 seconds
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +88,18 @@ class StartPage : AppCompatActivity() {
             val intent = Intent(this, signup::class.java) // Replace with your actual activity
             startActivity(intent)
         }
+    }
+
+    override fun onBackPressed() {
+        if (backPressedTime + backPressedDelay > System.currentTimeMillis()) {
+            // Exit the app if back button is pressed again within the delay
+            super.onBackPressed() // This will finish the activity and exit the app
+            return
+        } else {
+            // Show a toast message for the first back press
+            Toast.makeText(this, "Press back again to close the app", Toast.LENGTH_SHORT).show()
+        }
+        backPressedTime = System.currentTimeMillis()
     }
 
 

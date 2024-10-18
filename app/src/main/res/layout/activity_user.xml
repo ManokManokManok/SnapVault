@@ -134,7 +134,7 @@
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:background="@drawable/border_bg"
+            android:background="@color/lightergreen"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 

@@ -2,11 +2,11 @@ package com.example.snapvault_mk1
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.content.SharedPreferences
-import android.widget.Button
 
 class User : AppCompatActivity() {
 
@@ -19,7 +19,6 @@ class User : AppCompatActivity() {
     private lateinit var passwordsettings: Button
     private lateinit var logoutbutton: Button
     private lateinit var sharedPreferences: SharedPreferences
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +37,6 @@ class User : AppCompatActivity() {
         passwordsettings = findViewById(R.id.passwordsettings)
         logoutbutton = findViewById(R.id.logoutbutton)
 
-
         // Display the username in the TextView
         val welcomeMessage = findViewById<TextView>(R.id.welcomeTextView)
         welcomeMessage.text = "Settings for \n $username!"
@@ -46,6 +44,7 @@ class User : AppCompatActivity() {
         // Set onClickListeners for the icons
         homeIcon.setOnClickListener {
             val intent = Intent(this, WelcomeActivity::class.java)
+            overridePendingTransition(R.anim.slide_in_left, R.anim.slide_in_right)
             intent.putExtra("username", username)
             startActivity(intent)
         }
@@ -58,12 +57,6 @@ class User : AppCompatActivity() {
 
         createIcon.setOnClickListener {
             val intent = Intent(this, Createalbum::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
-        }
-
-        personIcon.setOnClickListener {
-            val intent = Intent(this, User::class.java)
             intent.putExtra("username", username)
             startActivity(intent)
         }
@@ -88,14 +81,17 @@ class User : AppCompatActivity() {
         logoutbutton.setOnClickListener {
             // Clear SharedPreferences
             sharedPreferences.edit().clear().apply()
-            // Start the StartPage activity
+
+            // Start the StartPage activity and clear the stack
             val intent = Intent(this, StartPage::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
-            finish() // Optional: Call finish() to remove this activity from the back stack
+            finish() // Optional: Finish the current activity
         }
+    }
 
-
-
+    override fun onBackPressed() {
+        // Optional: You can implement your custom back button functionality here
+        super.onBackPressed() // Default back button behavior
     }
 }

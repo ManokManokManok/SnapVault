@@ -30,6 +30,8 @@ class forgot_pass_verification : AppCompatActivity() {
     private lateinit var verificationCodeEditText: EditText
     private lateinit var emailEditText: EditText // This is your existing EditText for email input
     private lateinit var storedEmail: String // Store the email passed from the previous activity
+    private var backPressedTime: Long = 0
+    private val backPressedDelay: Long = 3000
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,11 +61,25 @@ class forgot_pass_verification : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (backPressedTime + backPressedDelay > System.currentTimeMillis()) {
+            // Navigate back to another activity instead of closing the app
+            val intent = Intent(this, Login::class.java) // Replace with your target activity
+            startActivity(intent)
+            finish() // Optional: finish the current activity if you want to remove it from the back stack
+            return
+        } else {
+            // Show a toast message for the first back press
+            Toast.makeText(this, "Press back again to go back to Sign in", Toast.LENGTH_SHORT).show()
+        }
+        backPressedTime = System.currentTimeMillis()
+    }
+
     // Function to verify the code with the API
     private fun verifyCode(verificationCode: String, email: String) {
         // Initialize Retrofit
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/") // Change this to your actual base URL
+            .baseUrl("http://192.168.1.11/") // Change this to your actual base URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
