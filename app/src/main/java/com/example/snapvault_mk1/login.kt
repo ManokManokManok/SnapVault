@@ -117,6 +117,30 @@ class Login : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        // Check if user is logged in when the activity starts
+        if (sharedPreferences.getBoolean("is_logged_in", false)) {
+            navigateToWelcomeActivity()
+        }
+    }
+
+    private fun navigateToWelcomeActivity() {
+        val username = sharedPreferences.getString("username", "")
+        val userId = sharedPreferences.getInt("user_id", -1)
+        val email = sharedPreferences.getString("email", "")
+
+        // Redirect to WelcomeActivity
+        val intent = Intent(this, WelcomeActivity::class.java)
+        intent.putExtra("username", username)
+        intent.putExtra("user_id", userId)
+        intent.putExtra("email", email)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) // Clear the back stack
+        startActivity(intent)
+        finish() // Close Login activity
+    }
+
     override fun onBackPressed() {
         // Navigate back to StartPage
         val intent = Intent(this, StartPage::class.java)
@@ -153,7 +177,7 @@ class Login : AppCompatActivity() {
     // Function to send login data to the server
     private fun sendLoginData(email: String, password: String) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.11/") // Replace with your server's IP
+            .baseUrl("http://10.0.2.2/") // Replace with your server's IP
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -175,6 +199,7 @@ class Login : AppCompatActivity() {
                         editor.putBoolean("is_logged_in", true)
                         editor.putString("username", username)
                         editor.putInt("user_id", id) // Save as user_id
+                        editor.putString("email", email) // Save email for later use
                         editor.apply()
 
                         Toast.makeText(this@Login, "Hello, $username!", Toast.LENGTH_SHORT).show()

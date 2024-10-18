@@ -21,12 +21,14 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
+// Updated API interface to include password field
 interface ChangeEmailApi {
     @FormUrlEncoded
-    @POST("change_email.php") // DITO YUNG API NATIN ALAM MO NA YAN DAPAT
+    @POST("change_email.php") // Ensure this matches your API endpoint
     fun changeEmail(
         @Field("current_email") currentEmail: String,
-        @Field("new_email") newEmail: String
+        @Field("new_email") newEmail: String,
+        @Field("current_password") password: String // Add password field for verification
     ): Call<ResponseBody>
 }
 
@@ -40,7 +42,7 @@ class Settings_Email : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_settings_email)
 
-       //EDGE TO EDGE SUPP NATEN (SEARCH MO NALANG KUNG DI KA SURE)
+        // Edge-to-edge support
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -55,6 +57,7 @@ class Settings_Email : AppCompatActivity() {
             findViewById(R.id.background),
             findViewById(R.id.curremail),
             findViewById(R.id.newemail),
+            findViewById(R.id.password), // Added password input field
             findViewById(R.id.emailicon),
             findViewById(R.id.passicon),
             findViewById(R.id.confirmbutton),
@@ -67,12 +70,10 @@ class Settings_Email : AppCompatActivity() {
             startActivity(Intent(this, User::class.java))
         }
 
-
-
-        // ALAM MO NA DAPAT TO JUSKO LAGING GINAGAMIT
+        // Hide all popup views initially
         popup.forEach { it.visibility = View.GONE }
 
-
+        // Show the popup
         if (!isPopupShown) {
             showPopup(popup, heightOfScreen)
             isPopupShown = true
@@ -81,20 +82,22 @@ class Settings_Email : AppCompatActivity() {
         val confirmButton = findViewById<Button>(R.id.confirmbutton)
         val currentEmailInput = findViewById<EditText>(R.id.curremail)
         val newEmailInput = findViewById<EditText>(R.id.newemail)
+        val passwordInput = findViewById<EditText>(R.id.password) // Password input field
 
-        // CLICK LISTENER NUNG CONFIRM BUTTON
+        // Set click listener for the confirm button
         confirmButton.setOnClickListener {
             val currentEmail = currentEmailInput.text.toString().trim()
             val newEmail = newEmailInput.text.toString().trim()
+            val password = passwordInput.text.toString().trim() // Get password input
 
-            // ITO NAG CHE CHECK KUNG YUNG NILAGAY NA EMAIL IS MATCH DUN SA ACCOUNT EMAIL NI USER
+            // Check if the current email matches the account email
             if (currentEmail != accountEmail) {
                 Toast.makeText(this, "Current email does not match your account.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // MAKES SURE NA CHAKA LANG IIBAHIN PAG VALID
-            changeEmail(currentEmail, newEmail)
+            // Change email if everything is valid
+            changeEmail(currentEmail, newEmail, password)
         }
     }
 
@@ -111,30 +114,31 @@ class Settings_Email : AppCompatActivity() {
         }
     }
 
-    private fun changeEmail(currentEmail: String, newEmail: String) {
-        // CHECKING KUNG MAY LAMAN YUNG NEW EMAIL FIELD
-        if (newEmail.isEmpty()) {
+    // Updated function to handle the password as well
+    private fun changeEmail(currentEmail: String, newEmail: String, password: String) {
+        // Check if the new email and password fields are not empty
+        if (newEmail.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // RETROFIT NATIN (!!WAG GAGALAWIN KUNG DI KAILANGAN!!)
+        // Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/") // IBAHIN AS NEEDED TO
+            .baseUrl("http://10.0.2.2/") // Update this as necessary
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val changeEmailApi = retrofit.create(ChangeEmailApi::class.java)
 
-        // NETWORK CALLING PRA IBAHIN YUNG EMAIL
-        changeEmailApi.changeEmail(currentEmail, newEmail).enqueue(object : Callback<ResponseBody> {
+        // Make network call to change the email and validate the password
+        changeEmailApi.changeEmail(currentEmail, newEmail, password).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     response.body()?.let { responseBody ->
-                        val responseMessage = responseBody.string() // Get the response from the PHP file
+                        val responseMessage = responseBody.string() // Get response from the server
                         Toast.makeText(this@Settings_Email, responseMessage, Toast.LENGTH_SHORT).show()
 
-                        // ITO NAG CHE CHECK KUNG SUCCESS AND IF SO BALIK SA LOGIN
+                        // Check if the email change was successful
                         if (responseMessage.contains("Email changed successfully", ignoreCase = true)) {
                             // Navigate back to the login page
                             startActivity(Intent(this@Settings_Email, Login::class.java))

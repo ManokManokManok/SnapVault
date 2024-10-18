@@ -21,12 +21,14 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
+// Update the interface to accept a password field
 interface ChangeUsernameApi {
     @FormUrlEncoded
     @POST("change_username.php") // Ensure this matches your PHP file location
     fun changeUsername(
         @Field("current_username") currentUsername: String,
-        @Field("new_username") newUsername: String
+        @Field("new_username") newUsername: String,
+        @Field("current_password") password: String // Add the password field
     ): Call<ResponseBody>
 }
 
@@ -55,6 +57,7 @@ class Settings_Username : AppCompatActivity() {
             findViewById(R.id.background),
             findViewById(R.id.curruser),
             findViewById(R.id.newuser),
+            findViewById(R.id.password), // Add reference to the password input
             findViewById(R.id.confirmbutton),
             findViewById(R.id.back)
         )
@@ -77,11 +80,13 @@ class Settings_Username : AppCompatActivity() {
         val confirmButton = findViewById<Button>(R.id.confirmbutton)
         val currentUsernameInput = findViewById<EditText>(R.id.curruser)
         val newUsernameInput = findViewById<EditText>(R.id.newuser)
+        val passwordInput = findViewById<EditText>(R.id.password) // Reference the password input
 
         // Set onClickListener for the confirm button
         confirmButton.setOnClickListener {
             val currentUsername = currentUsernameInput.text.toString().trim()
             val newUsername = newUsernameInput.text.toString().trim()
+            val password = passwordInput.text.toString().trim() // Get the password
 
             // Validate that the current username matches the account username
             if (currentUsername != accountUsername) {
@@ -89,8 +94,8 @@ class Settings_Username : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Change username if the current username is valid
-            changeUsername(currentUsername, newUsername)
+            // Change username if the current username is valid and password is provided
+            changeUsername(currentUsername, newUsername, password)
         }
     }
 
@@ -107,23 +112,24 @@ class Settings_Username : AppCompatActivity() {
         }
     }
 
-    private fun changeUsername(currentUsername: String, newUsername: String) {
-        // Check if the new username is not empty
-        if (newUsername.isEmpty()) {
+    // Update the changeUsername function to pass the password to the server
+    private fun changeUsername(currentUsername: String, newUsername: String, password: String) {
+        // Check if the new username and password are not empty
+        if (newUsername.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
             return
         }
 
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/") // Ensure this matches your local server
+            .baseUrl("http://10.0.2.2/") // Ensure this matches your local server
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val changeUsernameApi = retrofit.create(ChangeUsernameApi::class.java)
 
-        // Make the network call to change the username
-        changeUsernameApi.changeUsername(currentUsername, newUsername).enqueue(object : Callback<ResponseBody> {
+        // Make the network call to change the username and verify password
+        changeUsernameApi.changeUsername(currentUsername, newUsername, password).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     response.body()?.let { responseBody ->
@@ -131,13 +137,13 @@ class Settings_Username : AppCompatActivity() {
                         Toast.makeText(this@Settings_Username, responseMessage, Toast.LENGTH_SHORT).show()
 
                         // Check if the response indicates a successful username change
-                        if (responseMessage.contains("success", ignoreCase = true)) { // Adjust this condition based on your PHP response
+                        if (responseMessage.contains("success", ignoreCase = true)) {
                             // Update SharedPreferences with the new username
                             sharedPreferences.edit().putString("username", newUsername).apply()
 
                             // Navigate back to Login screen
-                            startActivity(Intent(this@Settings_Username, Login::class.java)) // Replace with actual LoginActivity name
-                            finish() // Optional: finish this activity so it doesn't remain in the back stack
+                            startActivity(Intent(this@Settings_Username, Login::class.java))
+                            finish() // Finish the current activity to remove it from the back stack
                         }
                     } ?: run {
                         Toast.makeText(this@Settings_Username, "Unexpected error occurred.", Toast.LENGTH_SHORT).show()

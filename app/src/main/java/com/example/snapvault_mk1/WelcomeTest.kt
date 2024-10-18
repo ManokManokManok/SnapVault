@@ -3,9 +3,10 @@ package com.example.snapvault_mk1
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -15,11 +16,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import android.provider.MediaStore
-import android.content.SharedPreferences
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -46,8 +44,7 @@ data class ImagesResponse(
     val images: List<String>
 )
 
-
-private const val BASE_URL = "http://192.168.1.11/" // Replace with your server's IP address
+private const val BASE_URL = "http://10.0.2.2/" // Replace with your server's IP address
 
 class WelcomeActivity : AppCompatActivity() {
 
@@ -56,46 +53,34 @@ class WelcomeActivity : AppCompatActivity() {
     private lateinit var personIcon: ImageView
     private lateinit var uploadIcon: ImageView
     private lateinit var uploadedImageView: ImageView
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var uploadService: UploadService
     private lateinit var recyclerView: RecyclerView
     private lateinit var imageAdapter: ImageAdapter
+    private var selectedImageUri: Uri? = null
 
     private val pickImageRequest = 1
-    private var selectedImageUri: Uri? = null
+    private lateinit var uploadService: UploadService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
-
-        if (!sharedPreferences.getBoolean("is_logged_in", false)) {
-            startActivity(Intent(this, Login::class.java))
-            finish()
-            return
-        }
-
         setContentView(R.layout.activity_welcome_test)
 
-        // Initialize Retrofit service
         initializeRetrofit()
-
-        // Initialize UI components
         initializeUI()
 
+        // Load user information
+        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         val userId = sharedPreferences.getInt("user_id", -1)
         val username = sharedPreferences.getString("username", "Guest") ?: "Guest"
         val userEmail = sharedPreferences.getString("email", "No email") ?: "No email"
 
-        Toast.makeText(this, "Saved User ID: $userId", Toast.LENGTH_SHORT).show()
-
-
-        findViewById<TextView>(R.id.welcomeTextView).text = "Welcome, $username\nEmail: $userEmail\nUser ID: $userId"
+        findViewById<TextView>(R.id.welcomeTextView).text =
+            "Welcome, $username\nEmail: $userEmail\nUser ID: $userId"
 
         if (userId != -1) {
-            fetchImages(userId) // Fetch images for the logged-in user
+            fetchImages(userId)
         }
 
+        // Check and request permissions
         if (!checkPermission()) {
             showPermissionExplanationDialog()
         }
@@ -104,7 +89,6 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun initializeRetrofit() {
-        // Initialize Retrofit
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -119,9 +103,9 @@ class WelcomeActivity : AppCompatActivity() {
         personIcon = findViewById(R.id.person)
         uploadIcon = findViewById(R.id.uploadicon)
         uploadedImageView = findViewById(R.id.uploadedImageView)
-        uploadedImageView.visibility = View.GONE
-
         recyclerView = findViewById(R.id.recyclerView)
+
+        uploadedImageView.visibility = View.GONE
         recyclerView.layoutManager = LinearLayoutManager(this)
         imageAdapter = ImageAdapter(mutableListOf())
         recyclerView.adapter = imageAdapter
@@ -146,7 +130,11 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun checkPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
     private fun showPermissionExplanationDialog() {
@@ -163,7 +151,19 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_MEDIA_IMAGES), pickImageRequest)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                pickImageRequest
+            )
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                pickImageRequest
+            )
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -206,13 +206,14 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun uploadImage(imageUri: Uri) {
+        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         val userId = sharedPreferences.getInt("user_id", -1)
+
         if (userId == -1) {
             Toast.makeText(this, "User ID not found. Please log in again.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Prepare the file for upload using the ContentResolver
         contentResolver.openInputStream(imageUri)?.use { inputStream ->
             val fileName = getFileName(imageUri) ?: "uploaded_image.jpg"
             val requestFile = RequestBody.create("image/*".toMediaType(), inputStream.readBytes())
@@ -223,80 +224,44 @@ class WelcomeActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@WelcomeActivity, "Image uploaded successfully!", Toast.LENGTH_SHORT).show()
-                        fetchImages(userId) // Fetch updated images after upload
+                        fetchImages(userId)
                     } else {
                         Toast.makeText(this@WelcomeActivity, "Failed to upload image. Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Log.e("UploadError", t.message.toString())
-                    Toast.makeText(this@WelcomeActivity, "Upload error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@WelcomeActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
-        } ?: Toast.makeText(this, "Error opening image. Please select a valid image.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun fetchImages(userId: Int) {
+        uploadService.fetchImages(userId).enqueue(object : retrofit2.Callback<ImagesResponse> {
+            override fun onResponse(call: Call<ImagesResponse>, response: retrofit2.Response<ImagesResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { imagesResponse ->
+                        if (imagesResponse.status == "success") {
+                            imageAdapter.updateImages(imagesResponse.images)
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ImagesResponse>, t: Throwable) {
+                Log.e("WelcomeActivity", "Error fetching images: ${t.message}")
+            }
+        })
     }
 
     private fun getFileName(uri: Uri): String? {
         val cursor = contentResolver.query(uri, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
-                val nameIndex = it.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME)
-                return it.getString(nameIndex)
+                return it.getString(it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME))
             }
         }
         return null
     }
-
-    private fun fetchImages(userId: Int) {
-        // Assuming you have an instance of UploadService
-        uploadService.fetchImages(userId).enqueue(object : retrofit2.Callback<ImagesResponse> {
-            override fun onResponse(call: Call<ImagesResponse>, response: retrofit2.Response<ImagesResponse>) {
-                if (response.isSuccessful) {
-                    val imagesResponse = response.body()
-                    Log.d("API Response", imagesResponse.toString()) // Log entire response
-                    if (imagesResponse?.status == "success") {
-                        showUrlsAlertDialog(imagesResponse.images)
-                    } else {
-                        Log.e("API Error", "Status is not success")
-                        showAlert("Error", "Failed to fetch images. Status not success.")
-                    }
-                } else {
-                    Log.e("API Error", "Response not successful: ${response.code()}")
-                    showAlert("Error", "Error fetching images: ${response.errorBody()?.string()}")
-                }
-            }
-
-            override fun onFailure(call: Call<ImagesResponse>, t: Throwable) {
-                showAlert("Error", "Fetch error: ${t.message}")
-            }
-        })
-    }
-
-
-    // Simple Alert function to display any message
-    private fun showAlert(title: String, message: String) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(title)
-        builder.setMessage(message)
-        builder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-        builder.show()
-    }
-
-
-    // New function to display URLs in an AlertDialog
-    private fun showUrlsAlertDialog(imageUrls: List<String>) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Fetched Image URLs")
-
-        // Create a string from the image URLs
-        val urlsString = imageUrls.joinToString("\n") // Join the URLs with new line for better readability
-        builder.setMessage(urlsString)
-
-        builder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-        builder.show()
-    }
-
-
-
 }

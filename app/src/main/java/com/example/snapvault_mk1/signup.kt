@@ -151,7 +151,7 @@ class signup : AppCompatActivity() {
 
     private fun sendSignupData(email: String, username: String, password: String) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.11/") // ILAGAY MO IP ADDRESS MO HA
+            .baseUrl("http://10.0.2.2/") // ILAGAY MO IP ADDRESS MO HA
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
