@@ -21,10 +21,12 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
+// Retrofit interface for change password API
 interface ChangePasswordApi {
     @FormUrlEncoded
     @POST("change_password.php") // Ensure this matches your PHP file location
     fun changePassword(
+        @Field("email") email: String,                 // Now sending the email
         @Field("current_password") currentPassword: String,
         @Field("new_password") newPassword: String
     ): Call<ResponseBody>
@@ -32,6 +34,7 @@ interface ChangePasswordApi {
 
 class Settings_Password : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
+    private var accountEmail: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +48,9 @@ class Settings_Password : AppCompatActivity() {
             insets
         }
 
+        // Retrieve email from shared preferences
         sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
+        accountEmail = sharedPreferences.getString("email", null) // Fetch stored email
 
         val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
         val popup = listOf<View>(
@@ -57,7 +62,6 @@ class Settings_Password : AppCompatActivity() {
         )
 
         val backButton = findViewById<Button>(R.id.back)
-
         backButton.setOnClickListener {
             startActivity(Intent(this, User::class.java))
         }
@@ -77,8 +81,13 @@ class Settings_Password : AppCompatActivity() {
             val currentPassword = currentPasswordInput.text.toString().trim()
             val newPassword = newPasswordInput.text.toString().trim()
 
-            // Change password if the current password is valid
-            changePassword(currentPassword, newPassword)
+            // Check if email is fetched from shared preferences
+            accountEmail?.let { email ->
+                // Change password if the current password is valid
+                changePassword(email, currentPassword, newPassword)
+            } ?: run {
+                Toast.makeText(this, "Email not found. Please log in again.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -95,7 +104,7 @@ class Settings_Password : AppCompatActivity() {
         }
     }
 
-    private fun changePassword(currentPassword: String, newPassword: String) {
+    private fun changePassword(email: String, currentPassword: String, newPassword: String) {
         // Check if the new password is not empty
         if (newPassword.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields.", Toast.LENGTH_SHORT).show()
@@ -104,14 +113,14 @@ class Settings_Password : AppCompatActivity() {
 
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.11/") // Ensure this matches your local server
+            .baseUrl("http://192.168.43.180/") // Ensure this matches your local server
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val changePasswordApi = retrofit.create(ChangePasswordApi::class.java)
 
         // Make the network call to change the password
-        changePasswordApi.changePassword(currentPassword, newPassword).enqueue(object : Callback<ResponseBody> {
+        changePasswordApi.changePassword(email, currentPassword, newPassword).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     response.body()?.let { responseBody ->

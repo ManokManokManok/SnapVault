@@ -98,7 +98,7 @@ class ForgotPass : AppCompatActivity() {
         Toast.makeText(this, "Sending email...", Toast.LENGTH_SHORT).show()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.11/") // Replace with your actual IP address or base URL
+            .baseUrl("http://192.168.43.180/") // Replace with your actual IP address or base URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

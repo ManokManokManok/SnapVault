@@ -142,7 +142,7 @@ class Login : AppCompatActivity() {
     // Function to send login data to the server
     private fun sendLoginData(email: String, password: String) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.11/")
+            .baseUrl("http://192.168.43.180/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

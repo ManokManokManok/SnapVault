@@ -107,7 +107,7 @@ class ChangePass : AppCompatActivity() {
 
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.11/") // Ensure this matches your local server
+            .baseUrl("http://192.168.43.180/") // Ensure this matches your local server
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
