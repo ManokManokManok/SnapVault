@@ -90,6 +90,7 @@ class User : AppCompatActivity() {
             sharedPreferences.edit().clear().apply()
             // Start the StartPage activity
             val intent = Intent(this, StartPage::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
             finish() // Optional: Call finish() to remove this activity from the back stack
         }

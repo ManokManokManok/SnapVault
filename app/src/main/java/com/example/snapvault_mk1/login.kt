@@ -142,7 +142,7 @@ class Login : AppCompatActivity() {
     // Function to send login data to the server
     private fun sendLoginData(email: String, password: String) {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/")
+            .baseUrl("http://192.168.1.11/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -167,6 +167,7 @@ class Login : AppCompatActivity() {
                         intent.putExtra("id", id)
                         intent.putExtra("email", email)
                         intent.putExtra("password", password)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         startActivity(intent)
                     } else {
                         Toast.makeText(this@Login, "Login failed: ${jsonObject.getString("message")}", Toast.LENGTH_SHORT).show()

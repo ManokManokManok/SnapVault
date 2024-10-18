@@ -31,11 +31,15 @@ interface ChangePassApi {
 
 class ChangePass : AppCompatActivity() {
     private var isPopupShown = false
+    private lateinit var storedEmail: String // Store the passed email
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_change_pass)
+
+        // Retrieve the stored email passed from the previous activity
+        storedEmail = intent.getStringExtra("email") ?: ""
 
         // Handle window insets for edge-to-edge support
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -71,7 +75,13 @@ class ChangePass : AppCompatActivity() {
         completeButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
             val newPassword = newPasswordInput.text.toString().trim()
-            changePassword(email, newPassword)
+
+            // Check if the email input matches the stored email
+            if (email != storedEmail) {
+                Toast.makeText(this, "This is not your email.", Toast.LENGTH_SHORT).show()
+            } else {
+                changePassword(email, newPassword) // Proceed with the API call if emails match
+            }
         }
     }
 
@@ -97,7 +107,7 @@ class ChangePass : AppCompatActivity() {
 
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // Ensure this matches your local server
+            .baseUrl("http://192.168.1.11/") // Ensure this matches your local server
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

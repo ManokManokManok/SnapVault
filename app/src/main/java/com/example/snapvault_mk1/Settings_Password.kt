@@ -104,7 +104,7 @@ class Settings_Password : AppCompatActivity() {
 
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // Ensure this matches your local server
+            .baseUrl("http://192.168.1.11/") // Ensure this matches your local server
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

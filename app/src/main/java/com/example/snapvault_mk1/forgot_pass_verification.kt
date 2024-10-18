@@ -1,17 +1,11 @@
 package com.example.snapvault_mk1
 
 import android.content.Intent
-import android.content.res.Resources
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,6 +15,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
+// Define the API interface
 interface VerificationApi {
     @FormUrlEncoded
     @POST("verify_code.php") // Ensure this matches your PHP script location
@@ -30,103 +25,70 @@ interface VerificationApi {
     ): Call<ResponseBody>
 }
 
+// Main activity for password verification
 class forgot_pass_verification : AppCompatActivity() {
-    private var isPopupShown = false
     private lateinit var verificationCodeEditText: EditText
-    private lateinit var email: String // Store the email passed from the previous activity
+    private lateinit var emailEditText: EditText // This is your existing EditText for email input
+    private lateinit var storedEmail: String // Store the email passed from the previous activity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_forgot_pass_verification)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         // Retrieve the email passed from the Forgot Password activity
-        email = intent.getStringExtra("email") ?: ""
+        storedEmail = intent.getStringExtra("email") ?: ""
 
-        verificationCodeEditText = findViewById(R.id.emailver) // Replace with your actual EditText ID
+        verificationCodeEditText = findViewById(R.id.emailver) // Replace with your actual EditText ID for verification code
+        emailEditText = findViewById(R.id.email) // Use your existing EditText ID for the email input
         val verifyButton: Button = findViewById(R.id.verifyemail) // Replace with your actual Button ID
 
-        val main = findViewById<ConstraintLayout>(R.id.main)
-        val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
-
-        val popup = listOf<View>(
-            findViewById(R.id.background),
-            findViewById(R.id.forgotlogo),
-            findViewById(R.id.info),
-            findViewById(R.id.email),
-            findViewById(R.id.emailicon),
-            findViewById(R.id.emailver),
-            findViewById(R.id.vericon),
-            findViewById(R.id.verifyemail),
-            findViewById(R.id.resend)
-        )
-
-        popup.forEach { it.visibility = View.GONE }
-
-        if (!isPopupShown) {
-            showPopup(popup, heightOfScreen)
-            isPopupShown = true
-        }
-
+        // Set onClickListener for verify button
         verifyButton.setOnClickListener {
             val verificationCode = verificationCodeEditText.text.toString()
-            if (verificationCode.isNotEmpty()) {
-                verifyCode(verificationCode, email)
-            } else {
+            val enteredEmail = emailEditText.text.toString() // Get the email entered by the user
+
+            // Check if the entered email matches the stored email
+            if (enteredEmail != storedEmail) {
+                Toast.makeText(this, "This is not your email.", Toast.LENGTH_SHORT).show()
+            } else if (verificationCode.isEmpty()) { // Check if the verification code is empty
                 Toast.makeText(this, "Please enter the verification code.", Toast.LENGTH_SHORT).show()
+            } else {
+                // Proceed with verification code API call if both checks pass
+                verifyCode(verificationCode, storedEmail) // Call your verification function here
             }
         }
     }
 
-    private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
-        popupViews.forEach { view ->
-            view.visibility = View.VISIBLE
-            view.translationY = heightOfScreen.toFloat()
-
-            view.animate()
-                .translationY(0f)
-                .setStartDelay(200)
-                .setDuration(500)
-                .start()
-        }
-    }
-
+    // Function to verify the code with the API
     private fun verifyCode(verificationCode: String, email: String) {
+        // Initialize Retrofit
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // Replace with your actual IP address or base URL
+            .baseUrl("http://192.168.1.11/") // Change this to your actual base URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        val verificationApi = retrofit.create(VerificationApi::class.java)
+        val api = retrofit.create(VerificationApi::class.java)
 
-        verificationApi.verifyCode(verificationCode, email).enqueue(object : Callback<ResponseBody> {
+        // Make the API call
+        api.verifyCode(verificationCode, email).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    response.body()?.let { responseBody ->
-                        val responseMessage = responseBody.string()
-                        Toast.makeText(this@forgot_pass_verification, responseMessage, Toast.LENGTH_LONG).show()
+                    // Handle successful response
+                    Toast.makeText(this@forgot_pass_verification, "Verification successful!", Toast.LENGTH_SHORT).show()
 
-                        if (responseMessage.contains("Verification successful", ignoreCase = true)) {
-                            val intent = Intent(this@forgot_pass_verification, ChangePass::class.java)
-                            intent.putExtra("email", email) // Pass email to the next activity if needed
-                            startActivity(intent)
-                            finish() // Optional: Finish this activity to remove it from the back stack
-                        }
-                    // Show response as a Toast
-                    } ?: run {
-                        Toast.makeText(this@forgot_pass_verification, "Unexpected error occurred.", Toast.LENGTH_SHORT).show()
-                    }
+                    val intent = Intent(this@forgot_pass_verification, ChangePass::class.java)
+                    intent.putExtra("email", storedEmail)
+                    startActivity(intent) // Start the ChangePass activity
+                    finish() // Optionally finish this activity if you don't want to return here
+
                 } else {
-                    Toast.makeText(this@forgot_pass_verification, "Failed to verify code: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    // Handle failure response
+                    Toast.makeText(this@forgot_pass_verification, "Verification failed. Please try again.", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                // Handle failure scenario
                 Toast.makeText(this@forgot_pass_verification, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
