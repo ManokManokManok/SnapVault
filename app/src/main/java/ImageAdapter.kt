@@ -18,8 +18,6 @@ class ImageAdapter(private val images: MutableList<String>) : RecyclerView.Adapt
         return ImageViewHolder(view)
     }
 
-
-
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val imageUrl = images[position]
         Glide.with(holder.itemView.context)
@@ -34,5 +32,10 @@ class ImageAdapter(private val images: MutableList<String>) : RecyclerView.Adapt
         images.addAll(newImages)
         notifyDataSetChanged()
     }
-}
 
+    // New method to add a single image
+    fun addImage(imageUrl: String) {
+        images.add(imageUrl)
+        notifyItemInserted(images.size - 1) // Notify that a new item was added
+    }
+}
