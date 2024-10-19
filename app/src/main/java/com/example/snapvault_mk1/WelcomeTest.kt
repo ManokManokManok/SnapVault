@@ -47,7 +47,7 @@ data class ImageData(
     val user_id: Int
 )
 
-private const val BASE_URL = "http://192.168.1.32/" // Replace with your server's IP address
+private const val BASE_URL = "http://10.0.2.2/" // Replace with your server's IP address
 
 class WelcomeActivity : AppCompatActivity() {
 

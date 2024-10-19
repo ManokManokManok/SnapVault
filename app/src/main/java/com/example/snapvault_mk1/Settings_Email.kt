@@ -120,7 +120,7 @@ class Settings_Email : AppCompatActivity() {
 
         // RETROFIT NATIN (!!WAG GAGALAWIN KUNG DI KAILANGAN!!)
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/") // IBAHIN AS NEEDED TO
+            .baseUrl("http://10.0.2.2/") // IBAHIN AS NEEDED TO
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
