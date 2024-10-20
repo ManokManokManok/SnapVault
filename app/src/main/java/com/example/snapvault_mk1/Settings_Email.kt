@@ -92,7 +92,11 @@ class Settings_Email : AppCompatActivity() {
 
             // Check if the current email matches the account email
             if (currentEmail != accountEmail) {
-                Toast.makeText(this, "Current email does not match your account.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Current email does not match your account.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -124,34 +128,63 @@ class Settings_Email : AppCompatActivity() {
 
         // Retrofit instance
         val retrofit = Retrofit.Builder()
+            .baseUrl("http://10.0.2.2/") // Update this as necessary
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-        val changeEmailApi = ApiClient.getRetrofitInstance().create(ChangeEmailApi::class.java)
+        val changeEmailApi = retrofit.create(ChangeEmailApi::class.java)
 
         // Make network call to change the email and validate the password
-        changeEmailApi.changeEmail(currentEmail, newEmail, password).enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
-                if (response.isSuccessful) {
-                    response.body()?.let { responseBody ->
-                        val responseMessage = responseBody.string() // Get response from the server
-                        Toast.makeText(this@Settings_Email, responseMessage, Toast.LENGTH_SHORT).show()
+        changeEmailApi.changeEmail(currentEmail, newEmail, password)
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: retrofit2.Response<ResponseBody>
+                ) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { responseBody ->
+                            val responseMessage =
+                                responseBody.string() // Get response from the server
+                            Toast.makeText(this@Settings_Email, responseMessage, Toast.LENGTH_SHORT)
+                                .show()
 
-                        // Check if the email change was successful
-                        if (responseMessage.contains("Email changed successfully", ignoreCase = true)) {
-                            // Navigate back to the login page
-                            startActivity(Intent(this@Settings_Email, Login::class.java))
-                            finish()
+                            // Check if the email change was successful
+                            if (responseMessage.contains(
+                                    "Email changed successfully",
+                                    ignoreCase = true
+                                )
+                            ) {
+                                // Update the SharedPreferences with the new email
+                                sharedPreferences.edit().putString("email", newEmail).apply()
+
+                                // Navigate back to the login page
+                                startActivity(Intent(this@Settings_Email, Login::class.java))
+                                finish()
+                            }
+                        } ?: run {
+                            Toast.makeText(
+                                this@Settings_Email,
+                                "Unexpected error occurred.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    } ?: run {
-                        Toast.makeText(this@Settings_Email, "Unexpected error occurred.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(
+                            this@Settings_Email,
+                            "Failed to change email: ${response.message()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                } else {
-                    Toast.makeText(this@Settings_Email, "Failed to change email: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
-            }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Toast.makeText(this@Settings_Email, "Network failure. Please try again.", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    Toast.makeText(
+                        this@Settings_Email,
+                        "Network failure. Please try again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 }
+

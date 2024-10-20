@@ -123,7 +123,7 @@ class Settings_Password : AppCompatActivity() {
                     response.body()?.let { responseBody ->
                         val responseMessage = responseBody.string() // Get the response from the PHP file
                         Toast.makeText(this@Settings_Password, responseMessage, Toast.LENGTH_SHORT).show()
-                        if (responseMessage == "Password changed successfully.") {
+                        if (responseMessage.contains("Password changed successfully", ignoreCase = true)) {
                             // Go back to Login on successful password change
                             startActivity(Intent(this@Settings_Password, Login::class.java))
                             finish() // Finish this activity

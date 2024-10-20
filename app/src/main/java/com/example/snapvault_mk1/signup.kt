@@ -68,7 +68,6 @@ class signup : AppCompatActivity() {
             findViewById(R.id.signin)
         )
 
-        // Dito YUNG MGA VALUES NYA
         popup.forEach { it.visibility = View.GONE }
 
         if (!isPopupShown) {
@@ -93,9 +92,15 @@ class signup : AppCompatActivity() {
                 return@setOnClickListener // Early return if validation fails
             }
 
-            // Check for whitespace only in password
-            if (password.trim().isEmpty()) {
-                Toast.makeText(this, "Please enter a valid password", Toast.LENGTH_SHORT).show()
+            // Check for whitespace and punctuation in username
+            if (!isValidUsername(username)) {
+                Toast.makeText(this, "Username cannot contain spaces or punctuation", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener // Early return if validation fails
+            }
+
+            // Check for whitespace and punctuation in password
+            if (!isValidPassword(password)) {
+                Toast.makeText(this, "Password cannot contain spaces or punctuation", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener // Early return if validation fails
             }
 
@@ -141,7 +146,6 @@ class signup : AppCompatActivity() {
         startActivity(intent)
         finish() // Optional: Finish the current activity to remove it from the back stack
     }
-
 
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
         popupViews.forEach { view ->
@@ -205,5 +209,13 @@ class signup : AppCompatActivity() {
         })
     }
 
+    private fun isValidUsername(username: String): Boolean {
+        // Check if username contains spaces or punctuation
+        return !username.contains(Regex("[\\s\\p{Punct}]"))
+    }
 
+    private fun isValidPassword(password: String): Boolean {
+        // Check if password contains spaces or punctuation
+        return !password.contains(Regex("[\\s\\p{Punct}]"))
+    }
 }
