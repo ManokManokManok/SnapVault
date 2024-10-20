@@ -104,14 +104,9 @@ class ForgotPass : AppCompatActivity() {
 
     private fun sendForgotPasswordData(email: String) {
         // Show a Toast message indicating that the email is being sent
-        Toast.makeText(this, "Sending email...", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Validating Email. Please Wait..", Toast.LENGTH_SHORT).show()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // Replace with your actual IP address or base URL
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val forgotPassApi = retrofit.create(ForgotPassApi::class.java)
+        val forgotPassApi = ApiClient.getRetrofitInstance().create(ForgotPassApi::class.java)
 
         forgotPassApi.forgotPassword(email).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {

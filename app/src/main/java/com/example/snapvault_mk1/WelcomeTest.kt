@@ -16,14 +16,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -46,8 +42,6 @@ data class ImageData(
     val image: String, // Base64 encoded image string
     val user_id: Int
 )
-
-private const val BASE_URL = "http://10.0.2.2/" // Replace with your server's IP address
 
 class WelcomeActivity : AppCompatActivity() {
 
@@ -118,12 +112,8 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun initializeRetrofit() {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        uploadService = retrofit.create(UploadService::class.java)
+        // Use ApiClient to get the Retrofit instance and create the UploadService
+        uploadService = ApiClient.getRetrofitInstance().create(UploadService::class.java)
     }
 
     private fun initializeUI() {

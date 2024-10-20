@@ -78,12 +78,7 @@ class forgot_pass_verification : AppCompatActivity() {
     // Function to verify the code with the API
     private fun verifyCode(verificationCode: String, email: String) {
         // Initialize Retrofit
-        val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // Change this to your actual base URL
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val api = retrofit.create(VerificationApi::class.java)
+        val api = ApiClient.getRetrofitInstance().create(VerificationApi::class.java)
 
         // Make the API call
         api.verifyCode(verificationCode, email).enqueue(object : Callback<ResponseBody> {

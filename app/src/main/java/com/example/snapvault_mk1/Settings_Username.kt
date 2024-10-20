@@ -122,11 +122,8 @@ class Settings_Username : AppCompatActivity() {
 
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // Ensure this matches your local server
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
 
-        val changeUsernameApi = retrofit.create(ChangeUsernameApi::class.java)
+        val changeUsernameApi = ApiClient.getRetrofitInstance().create(ChangeUsernameApi::class.java)
 
         // Make the network call to change the username and verify password
         changeUsernameApi.changeUsername(currentUsername, newUsername, password).enqueue(object : Callback<ResponseBody> {

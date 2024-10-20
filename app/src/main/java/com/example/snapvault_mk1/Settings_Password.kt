@@ -113,11 +113,8 @@ class Settings_Password : AppCompatActivity() {
 
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // Ensure this matches your local server
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
 
-        val changePasswordApi = retrofit.create(ChangePasswordApi::class.java)
+        val changePasswordApi = ApiClient.getRetrofitInstance().create(ChangePasswordApi::class.java)
 
         // Make the network call to change the password
         changePasswordApi.changePassword(email, currentPassword, newPassword).enqueue(object : Callback<ResponseBody> {
