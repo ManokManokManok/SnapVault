@@ -79,7 +79,7 @@ class forgot_pass_verification : AppCompatActivity() {
     private fun verifyCode(verificationCode: String, email: String) {
         // Initialize Retrofit
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.11/") // Change this to your actual base URL
+            .baseUrl("http://10.0.2.2/") // Change this to your actual base URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

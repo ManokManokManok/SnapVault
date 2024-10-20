@@ -3,19 +3,15 @@ package com.example.snapvault_mk1
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -23,31 +19,32 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
-import retrofit2.http.POST
-import java.io.ByteArrayOutputStream
+import retrofit2.http.*
 
-// Define the API service for uploading image data as Base64
 interface UploadService {
+    @Multipart
     @POST("upload_image.php")
     fun uploadImage(
-        @Body imageData: ImageData
+        @Part image: MultipartBody.Part,
+        @Part("user_id") userId: RequestBody
     ): Call<ResponseBody>
+
+    @GET("get_user_images.php")
+    fun fetchImages(@Query("user_id") userId: Int): Call<ImagesResponse>
 }
 
-// Data class for the image and userId request
-data class ImageData(
-    val image: String, // Base64 encoded image string
-    val user_id: Int
+data class ImagesResponse(
+    val status: String,
+    val images: List<String>
 )
 
-private const val BASE_URL = "http://192.168.1.32/" // Replace with your server's IP address
+private const val BASE_URL = "http://10.0.2.2/" // Replace with your server's IP address
 
 class WelcomeActivity : AppCompatActivity() {
 
@@ -55,63 +52,37 @@ class WelcomeActivity : AppCompatActivity() {
     private lateinit var createIcon: ImageView
     private lateinit var personIcon: ImageView
     private lateinit var uploadIcon: ImageView
+    private lateinit var uploadedImageView: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var imageAdapter: ImageAdapter
-    private lateinit var uploadService: UploadService
-
     private var selectedImageUri: Uri? = null
 
-    // Register permission result handler
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            openImagePicker()
-        } else {
-            Toast.makeText(this, "Permission denied. Please enable access from settings.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    // Register image picker result handler
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK && result.data != null) {
-            selectedImageUri = result.data?.data
-            selectedImageUri?.let { uri ->
-                uploadImage(uri)
-            }
-        }
-    }
+    private val pickImageRequest = 1
+    private lateinit var uploadService: UploadService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
-
-        if (!sharedPreferences.getBoolean("is_logged_in", false)) {
-            startActivity(Intent(this, Login::class.java))
-            finish()
-            return
-        }
-
         setContentView(R.layout.activity_welcome_test)
 
-        // Initialize Retrofit service
         initializeRetrofit()
-
-        // Initialize UI components
         initializeUI()
 
+        // Load user information
+        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         val userId = sharedPreferences.getInt("user_id", -1)
         val username = sharedPreferences.getString("username", "Guest") ?: "Guest"
         val userEmail = sharedPreferences.getString("email", "No email") ?: "No email"
 
-        findViewById<TextView>(R.id.welcomeTextView).text = "Welcome, $username\nEmail: $userEmail\nUser ID: $userId"
+        findViewById<TextView>(R.id.welcomeTextView).text =
+            "Welcome, $username\nEmail: $userEmail\nUser ID: $userId"
 
         if (userId != -1) {
-            fetchImages(userId) // Fetch images for the logged-in user
+            fetchImages(userId)
         }
 
-        // Check if permission is already granted
+        // Check and request permissions
         if (!checkPermission()) {
-            requestPermission()
+            showPermissionExplanationDialog()
         }
 
         setClickListeners()
@@ -131,9 +102,11 @@ class WelcomeActivity : AppCompatActivity() {
         createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
         uploadIcon = findViewById(R.id.uploadicon)
-
+        uploadedImageView = findViewById(R.id.uploadedImageView)
         recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) // Set horizontal layout manager
+
+        uploadedImageView.visibility = View.GONE
+        recyclerView.layoutManager = LinearLayoutManager(this)
         imageAdapter = ImageAdapter(mutableListOf())
         recyclerView.adapter = imageAdapter
     }
@@ -146,22 +119,90 @@ class WelcomeActivity : AppCompatActivity() {
             if (checkPermission()) {
                 openImagePicker()
             } else {
-                requestPermission()
+                showPermissionExplanationDialog()
             }
         }
     }
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        pickImageLauncher.launch(intent)
+        startActivityForResult(intent, pickImageRequest)
     }
 
     private fun checkPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun showPermissionExplanationDialog() {
+        AlertDialog.Builder(this)
+            .setMessage("This app needs permission to access your photos to upload images.")
+            .setCancelable(false)
+            .setPositiveButton("OK") { dialog, _ ->
+                requestPermission()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+            .setTitle("Permission Required")
+            .show()
     }
 
     private fun requestPermission() {
-        requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                pickImageRequest
+            )
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                pickImageRequest
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == pickImageRequest) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openImagePicker()
+            } else {
+                Toast.makeText(this, "Permission denied. Please allow access in app settings.", Toast.LENGTH_SHORT).show()
+                showSettingsDialog()
+            }
+        }
+    }
+
+    private fun showSettingsDialog() {
+        AlertDialog.Builder(this)
+            .setMessage("Permission is needed for the app to function correctly. Please enable it in app settings.")
+            .setCancelable(false)
+            .setPositiveButton("Settings") { dialog, _ ->
+                startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:$packageName")
+                })
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+            .setTitle("Permission Required")
+            .show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == pickImageRequest && resultCode == RESULT_OK && data != null) {
+            selectedImageUri = data.data
+            selectedImageUri?.let {
+                uploadedImageView.setImageURI(it)
+                uploadedImageView.visibility = View.VISIBLE
+                uploadImage(it)
+            }
+        }
     }
 
     private fun uploadImage(imageUri: Uri) {
@@ -173,15 +214,16 @@ class WelcomeActivity : AppCompatActivity() {
             return
         }
 
-        val base64Image = imageUriToBase64(imageUri)
-        if (base64Image != null) {
-            val imageData = ImageData(image = base64Image, user_id = userId)
+        contentResolver.openInputStream(imageUri)?.use { inputStream ->
+            val fileName = getFileName(imageUri) ?: "uploaded_image.jpg"
+            val requestFile = RequestBody.create("image/*".toMediaType(), inputStream.readBytes())
+            val body = MultipartBody.Part.createFormData("image", fileName, requestFile)
+            val userIdRequestBody = RequestBody.create("text/plain".toMediaType(), userId.toString())
 
-            uploadService.uploadImage(imageData).enqueue(object : Callback<ResponseBody> {
+            uploadService.uploadImage(body, userIdRequestBody).enqueue(object : retrofit2.Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@WelcomeActivity, "Image uploaded successfully!", Toast.LENGTH_SHORT).show()
-                        imageAdapter.addImage(imageUri.toString()) // Convert Uri to String before adding
                         fetchImages(userId)
                     } else {
                         Toast.makeText(this@WelcomeActivity, "Failed to upload image. Please try again.", Toast.LENGTH_SHORT).show()
@@ -189,36 +231,37 @@ class WelcomeActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Log.e("UploadError", t.message.toString())
-                    Toast.makeText(this@WelcomeActivity, "Upload error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@WelcomeActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
-        } else {
-            Toast.makeText(this, "Error converting image to Base64. Please try again.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun imageUriToBase64(uri: Uri): String? {
-        return try {
-            val bitmap: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val source = ImageDecoder.createSource(contentResolver, uri)
-                ImageDecoder.decodeBitmap(source)
-            } else {
-                MediaStore.Images.Media.getBitmap(contentResolver, uri)
-            }
-
-            val outputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream) // Compress the image to JPEG
-            val byteArray = outputStream.toByteArray()
-            Base64.encodeToString(byteArray, Base64.DEFAULT) // Encode to Base64
-        } catch (e: Exception) {
-            Log.e("ImageError", e.message.toString())
-            null // Return null on error
         }
     }
 
     private fun fetchImages(userId: Int) {
-        // Implementation for fetching images associated with the user from the server.
-        // You need to add your API call logic here.
+        uploadService.fetchImages(userId).enqueue(object : retrofit2.Callback<ImagesResponse> {
+            override fun onResponse(call: Call<ImagesResponse>, response: retrofit2.Response<ImagesResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { imagesResponse ->
+                        if (imagesResponse.status == "success") {
+                            imageAdapter.updateImages(imagesResponse.images)
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ImagesResponse>, t: Throwable) {
+                Log.e("WelcomeActivity", "Error fetching images: ${t.message}")
+            }
+        })
+    }
+
+    private fun getFileName(uri: Uri): String? {
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                return it.getString(it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME))
+            }
+        }
+        return null
     }
 }

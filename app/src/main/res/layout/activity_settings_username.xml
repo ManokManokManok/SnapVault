@@ -10,9 +10,9 @@
 
     <ImageView
         android:id="@+id/settingslogo"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="50dp"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="40dp"
         android:src="@drawable/settings_logo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,10 +22,9 @@
         android:id="@+id/welcomeTextView"
         android:layout_width="400dp"
         android:layout_height="90dp"
-        android:layout_marginTop="16dp"
         android:text="Would you like to change your username?"
         android:gravity="center"
-        android:textSize="35dp"
+        android:textSize="30dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -91,16 +90,43 @@
         android:layout_width="60dp"
         android:layout_height="67dp"
         android:background="@drawable/semi_circle_left"
-        android:drawableLeft="@drawable/pass_icon"
+        android:drawableLeft="@drawable/ic_person"
         android:padding="10dp"
         app:layout_constraintEnd_toStartOf="@id/newuser"
         app:layout_constraintTop_toTopOf="@id/newuser" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="290dp"
+        android:layout_height="67dp"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/semi_circle_corner"
+        android:ems="10"
+        android:fontFamily="@font/fredoka_regular"
+        android:textSize="25sp"
+        android:hint="Current Password"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        app:layout_constraintStart_toEndOf="@id/passicon"
+        app:layout_constraintTop_toBottomOf="@id/newuser"/>
+
+    <TextView
+        android:id="@+id/passicon2"
+        android:layout_width="60dp"
+        android:layout_height="67dp"
+        android:background="@drawable/semi_circle_left"
+        android:drawableLeft="@drawable/pass_icon"
+        android:padding="10dp"
+        app:layout_constraintEnd_toStartOf="@id/password"
+        app:layout_constraintTop_toTopOf="@id/password" />
 
     <Button
         android:id="@+id/confirmbutton"
         android:layout_width="150dp"
         android:layout_height="60dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="30dp"
         android:backgroundTint="#698F42"
         android:text="Confirm"
         android:textSize="30sp"
@@ -108,7 +134,7 @@
         android:fontFamily="@font/fredoka_regular"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/newuser" />
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <Button
         android:id="@+id/back"

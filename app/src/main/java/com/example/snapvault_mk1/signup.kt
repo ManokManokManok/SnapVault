@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import okhttp3.ResponseBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Retrofit
@@ -21,7 +22,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
-interface ApiService {
+interface SignupService {
     @FormUrlEncoded
     @POST("signup.php") // Make sure this points to your PHP script
     fun signup(
@@ -80,13 +81,32 @@ class signup : AppCompatActivity() {
             val email = emailEditText.text.toString()
             val username = usernameEditText.text.toString()
 
+            // Check if any fields are empty
             if (email.isEmpty() || username.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-            } else if (password.length < 6) {
-                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
-            } else {
-                sendSignupData(email, username, password)
+                return@setOnClickListener // Early return if validation fails
             }
+
+            // Check for whitespace only in username
+            if (username.trim().isEmpty()) {
+                Toast.makeText(this, "Please enter a valid username", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener // Early return if validation fails
+            }
+
+            // Check for whitespace only in password
+            if (password.trim().isEmpty()) {
+                Toast.makeText(this, "Please enter a valid password", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener // Early return if validation fails
+            }
+
+            // Password length validation
+            if (password.length < 6) {
+                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener // Early return if validation fails
+            }
+
+            // All checks passed, send the data
+            sendSignupData(email, username, password)
         }
 
         signinButton.setOnClickListener {
@@ -150,37 +170,40 @@ class signup : AppCompatActivity() {
     }
 
     private fun sendSignupData(email: String, username: String, password: String) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.32/") // ILAGAY MO IP ADDRESS MO HA
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val apiService = retrofit.create(ApiService::class.java)
+        val apiService = ApiClient.getRetrofitInstance().create(SignupService::class.java)
 
         apiService.signup(email, username, password).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    // MADE IT SO THAT CHAKA LANG NYA SABIHIN IF WALANG ERROR
                     Toast.makeText(this@signup, "Signup successful!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this@signup, Login::class.java)
                     startActivity(intent)
                 } else {
-                    // DITO KINU KUHA NYA YUNG ERROR RESPONSE NG .PHP FILES NATIN
-                    response.errorBody()?.let { errorBody ->
-                        // Use a Toast to show the error message from the PHP backend
-                        Toast.makeText(this@signup, errorBody.string(), Toast.LENGTH_SHORT).show()
-                    } ?: run {
-                        // ITO IF WALANG MAHANAP NA ERROR
-                        Toast.makeText(this@signup, "Signup failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    // Capture error information and show in Toast
+                    val errorBody = response.errorBody()
+                    if (errorBody != null) {
+                        try {
+                            val errorBodyString = errorBody.string()
+
+                            // Extract the error message from the JSON
+                            val jsonObject = JSONObject(errorBodyString)
+                            val errorMessage = jsonObject.getString("error") // Assuming your PHP returns "error" key
+
+                            Toast.makeText(this@signup, errorMessage, Toast.LENGTH_LONG).show()
+                        } catch (e: Exception) {
+                            Toast.makeText(this@signup, "Error parsing response: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                    } else {
+                        Toast.makeText(this@signup, "Response error: ${response.message()}", Toast.LENGTH_LONG).show()
                     }
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Toast.makeText(this@signup, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@signup, "Request failed: ${t.message}", Toast.LENGTH_LONG).show()
             }
         })
-
-        Log.d("SignupData", "Email: $email, Username: $username, Password: $password")
     }
+
+
 }
