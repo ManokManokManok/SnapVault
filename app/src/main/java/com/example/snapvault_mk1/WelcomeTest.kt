@@ -16,7 +16,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +27,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
 // Define the API service for uploading image data as Base64
@@ -37,11 +39,12 @@ interface UploadService {
         @Body imageData: ImageData
     ): Call<ResponseBody> // Expecting a response body for upload
 
-    // Updated method to fetch images as ResponseBody
+    // Updated method to fetch images using form-encoded parameters
+    @FormUrlEncoded // Add this annotation to specify form data
     @POST("get_user_images.php")
     fun fetchImages(
-        @Body user_id: Int
-    ): Call<ResponseBody> // Changed to ResponseBody
+        @Field("user_id") userId: Int // Change to @Field with the name that the PHP script expects
+    ): Call<ResponseBody> // Expecting a response body for fetching images
 }
 
 // Data class for the image and userId request
@@ -102,7 +105,7 @@ class WelcomeActivity : AppCompatActivity() {
         // Initialize UI components
         initializeUI()
 
-        val user_Id = 2
+        val user_Id = sharedPreferences.getInt("user_id", -1)
         val username = sharedPreferences.getString("username", "Guest") ?: "Guest"
         val userEmail = sharedPreferences.getString("email", "No email") ?: "No email"
 
@@ -185,21 +188,20 @@ class WelcomeActivity : AppCompatActivity() {
             uploadService.uploadImage(imageData).enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                     if (response.isSuccessful) {
-                        showAlertDialog("Success", "Image uploaded successfully!") // Show success alert
+                        Log.d("UploadSuccess", "Image uploaded successfully!") // Log success message
                         imageAdapter.addImage(imageUri.toString()) // Convert Uri to String before adding
                         fetchImages(userId)
                     } else {
-                        showAlertDialog("Error", "Failed to upload image. Please try again.") // Show error alert
+                        Log.e("UploadError", "Failed to upload image. Response code: ${response.code()}") // Log error message
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Log.e("UploadError", t.message.toString())
-                    showAlertDialog("Upload Error", "Upload error: ${t.message}") // Show upload error alert
+                    Log.e("UploadError", t.message.toString()) // Log error message
                 }
             })
         } else {
-            Toast.makeText(this, "Error converting image to Base64. Please try again.", Toast.LENGTH_SHORT).show()
+            Log.e("UploadError", "Error converting image to Base64.") // Log error message
         }
     }
 
@@ -223,7 +225,6 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun fetchImages(userId: Int) {
-        Log.d("FetchImages", "User ID being sent: $userId")
         uploadService.fetchImages(userId).enqueue(object : Callback<ResponseBody> { // Use ResponseBody
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
@@ -233,26 +234,35 @@ class WelcomeActivity : AppCompatActivity() {
                     // Log the raw response for debugging
                     Log.d("RawResponse", rawResponse)
 
-                    // Show the raw response in an alert dialog
-                    showAlertDialog("Server Response", rawResponse)
+                    try {
+                        // Parse the JSON response
+                        val jsonResponse = JSONObject(rawResponse)
+                        val status = jsonResponse.getString("status")
+
+                        if (status == "success") {
+                            val imagesJsonArray = jsonResponse.getJSONArray("images")
+                            val imagesList = mutableListOf<String>()
+
+                            for (i in 0 until imagesJsonArray.length()) {
+                                imagesList.add(imagesJsonArray.getString(i))
+                            }
+
+                            // Update the adapter with the fetched images
+                            imageAdapter.updateImages(imagesList) // Use a method to update the list in your adapter
+                        } else {
+                            Log.e("FetchError", "Failed to fetch images: $status") // Log error message
+                        }
+                    } catch (e: Exception) {
+                        Log.e("JSONError", "Error parsing JSON response: ${e.message}") // Log error message
+                    }
                 } else {
-                    showAlertDialog("Error", "Failed to fetch images. Response code: ${response.code()}")
+                    Log.e("FetchError", "Failed to fetch images. Response code: ${response.code()}") // Log error message
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                showAlertDialog("Error", "Error: ${t.message}")
+                Log.e("FetchError", "Error: ${t.message}") // Log error message
             }
         })
-    }
-
-
-    private fun showAlertDialog(title: String, message: String) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(title)
-            .setMessage(message)
-            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-            .create()
-            .show()
     }
 }
