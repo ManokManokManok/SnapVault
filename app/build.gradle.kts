@@ -76,6 +76,7 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.0")
     implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation("org.json:json:20210307")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

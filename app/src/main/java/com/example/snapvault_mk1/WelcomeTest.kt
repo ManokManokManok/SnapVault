@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,7 +25,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.POST
 import java.io.ByteArrayOutputStream
@@ -34,7 +35,13 @@ interface UploadService {
     @POST("upload_image.php")
     fun uploadImage(
         @Body imageData: ImageData
-    ): Call<ResponseBody>
+    ): Call<ResponseBody> // Expecting a response body for upload
+
+    // Updated method to fetch images as ResponseBody
+    @POST("get_user_images.php")
+    fun fetchImages(
+        @Body user_id: Int
+    ): Call<ResponseBody> // Changed to ResponseBody
 }
 
 // Data class for the image and userId request
@@ -69,6 +76,8 @@ class WelcomeActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK && result.data != null) {
             selectedImageUri = result.data?.data
             selectedImageUri?.let { uri ->
+                Log.d("ImageURI", "Selected Image URI: $uri")
+                Toast.makeText(this, "Selected Image URI: $uri", Toast.LENGTH_LONG).show()
                 uploadImage(uri)
             }
         }
@@ -93,14 +102,21 @@ class WelcomeActivity : AppCompatActivity() {
         // Initialize UI components
         initializeUI()
 
-        val userId = sharedPreferences.getInt("user_id", -1)
+        val user_Id = 2
         val username = sharedPreferences.getString("username", "Guest") ?: "Guest"
         val userEmail = sharedPreferences.getString("email", "No email") ?: "No email"
 
-        findViewById<TextView>(R.id.welcomeTextView).text = "Welcome, $username\nEmail: $userEmail\nUser ID: $userId"
+        Log.d("UserId", "Fetched User ID: $user_Id")
 
-        if (userId != -1) {
-            fetchImages(userId) // Fetch images for the logged-in user
+        if (user_Id == -1) {
+            Toast.makeText(this, "User ID not found. Please log in again.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        findViewById<TextView>(R.id.welcomeTextView).text = "Welcome, $username\nEmail: $userEmail\nUser ID: $user_Id"
+
+        if (user_Id != -1) {
+            fetchImages(user_Id) // Fetch images for the logged-in user
         }
 
         // Check if permission is already granted
@@ -112,7 +128,6 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun initializeRetrofit() {
-        // Use ApiClient to get the Retrofit instance and create the UploadService
         uploadService = ApiClient.getRetrofitInstance().create(UploadService::class.java)
     }
 
@@ -170,17 +185,17 @@ class WelcomeActivity : AppCompatActivity() {
             uploadService.uploadImage(imageData).enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@WelcomeActivity, "Image uploaded successfully!", Toast.LENGTH_SHORT).show()
+                        showAlertDialog("Success", "Image uploaded successfully!") // Show success alert
                         imageAdapter.addImage(imageUri.toString()) // Convert Uri to String before adding
                         fetchImages(userId)
                     } else {
-                        Toast.makeText(this@WelcomeActivity, "Failed to upload image. Please try again.", Toast.LENGTH_SHORT).show()
+                        showAlertDialog("Error", "Failed to upload image. Please try again.") // Show error alert
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     Log.e("UploadError", t.message.toString())
-                    Toast.makeText(this@WelcomeActivity, "Upload error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    showAlertDialog("Upload Error", "Upload error: ${t.message}") // Show upload error alert
                 }
             })
         } else {
@@ -208,7 +223,36 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private fun fetchImages(userId: Int) {
-        // Implementation for fetching images associated with the user from the server.
-        // You need to add your API call logic here.
+        Log.d("FetchImages", "User ID being sent: $userId")
+        uploadService.fetchImages(userId).enqueue(object : Callback<ResponseBody> { // Use ResponseBody
+            override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    // Capture the raw response as a string
+                    val rawResponse = response.body()?.string() ?: "No response"
+
+                    // Log the raw response for debugging
+                    Log.d("RawResponse", rawResponse)
+
+                    // Show the raw response in an alert dialog
+                    showAlertDialog("Server Response", rawResponse)
+                } else {
+                    showAlertDialog("Error", "Failed to fetch images. Response code: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                showAlertDialog("Error", "Error: ${t.message}")
+            }
+        })
+    }
+
+
+    private fun showAlertDialog(title: String, message: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .create()
+            .show()
     }
 }

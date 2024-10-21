@@ -10,11 +10,11 @@ import com.bumptech.glide.Glide
 class ImageAdapter(private val images: MutableList<String>) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
 
     class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.imageView) // Change this to your actual ImageView ID
+        val imageView: ImageView = itemView.findViewById(R.id.imageView) // Ensure this ID matches your layout
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_image, parent, false) // Replace with your image item layout
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_image, parent, false) // Ensure this layout exists
         return ImageViewHolder(view)
     }
 
@@ -27,15 +27,22 @@ class ImageAdapter(private val images: MutableList<String>) : RecyclerView.Adapt
 
     override fun getItemCount(): Int = images.size
 
+    // Update the images and notify the adapter
     fun updateImages(newImages: List<String>) {
         images.clear()
         images.addAll(newImages)
         notifyDataSetChanged()
     }
 
-    // New method to add a single image
+    // New method to add a single image and notify the adapter
     fun addImage(imageUrl: String) {
         images.add(imageUrl)
         notifyItemInserted(images.size - 1) // Notify that a new item was added
+    }
+
+    // New method to clear images and notify the adapter
+    fun clearImages() {
+        images.clear()
+        notifyDataSetChanged()
     }
 }
