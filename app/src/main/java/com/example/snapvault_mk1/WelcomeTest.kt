@@ -18,7 +18,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -40,16 +40,16 @@ interface UploadService {
     ): Call<ResponseBody> // Expecting a response body for upload
 
     // Updated method to fetch images using form-encoded parameters
-    @FormUrlEncoded // Add this annotation to specify form data
+    @FormUrlEncoded
     @POST("get_user_images.php")
     fun fetchImages(
-        @Field("user_id") userId: Int // Change to @Field with the name that the PHP script expects
+        @Field("user_id") userId: Int
     ): Call<ResponseBody> // Expecting a response body for fetching images
 }
 
 // Data class for the image and userId request
 data class ImageData(
-    val image: String, // Base64 encoded image string
+    val image: String,
     val user_id: Int
 )
 
@@ -141,7 +141,10 @@ class WelcomeActivity : AppCompatActivity() {
         uploadIcon = findViewById(R.id.uploadicon)
 
         recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) // Set horizontal layout manager
+
+        // Set the GridLayoutManager to display 2 items per row
+        recyclerView.layoutManager = GridLayoutManager(this, 3) // Change '2' to adjust the number of columns
+
         imageAdapter = ImageAdapter(mutableListOf())
         recyclerView.adapter = imageAdapter
     }
@@ -188,20 +191,20 @@ class WelcomeActivity : AppCompatActivity() {
             uploadService.uploadImage(imageData).enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                     if (response.isSuccessful) {
-                        Log.d("UploadSuccess", "Image uploaded successfully!") // Log success message
-                        imageAdapter.addImage(imageUri.toString()) // Convert Uri to String before adding
+                        Log.d("UploadSuccess", "Image uploaded successfully!")
+                        imageAdapter.addImage(imageUri.toString())
                         fetchImages(userId)
                     } else {
-                        Log.e("UploadError", "Failed to upload image. Response code: ${response.code()}") // Log error message
+                        Log.e("UploadError", "Failed to upload image. Response code: ${response.code()}")
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Log.e("UploadError", t.message.toString()) // Log error message
+                    Log.e("UploadError", t.message.toString())
                 }
             })
         } else {
-            Log.e("UploadError", "Error converting image to Base64.") // Log error message
+            Log.e("UploadError", "Error converting image to Base64.")
         }
     }
 
@@ -215,27 +218,23 @@ class WelcomeActivity : AppCompatActivity() {
             }
 
             val outputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream) // Compress the image to JPEG
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
             val byteArray = outputStream.toByteArray()
-            Base64.encodeToString(byteArray, Base64.DEFAULT) // Encode to Base64
+            Base64.encodeToString(byteArray, Base64.DEFAULT)
         } catch (e: Exception) {
             Log.e("ImageError", e.message.toString())
-            null // Return null on error
+            null
         }
     }
 
     private fun fetchImages(userId: Int) {
-        uploadService.fetchImages(userId).enqueue(object : Callback<ResponseBody> { // Use ResponseBody
+        uploadService.fetchImages(userId).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: retrofit2.Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    // Capture the raw response as a string
                     val rawResponse = response.body()?.string() ?: "No response"
-
-                    // Log the raw response for debugging
                     Log.d("RawResponse", rawResponse)
 
                     try {
-                        // Parse the JSON response
                         val jsonResponse = JSONObject(rawResponse)
                         val status = jsonResponse.getString("status")
 
@@ -246,22 +245,22 @@ class WelcomeActivity : AppCompatActivity() {
                             for (i in 0 until imagesJsonArray.length()) {
                                 imagesList.add(imagesJsonArray.getString(i))
                             }
+                            imagesList.reverse()
 
-                            // Update the adapter with the fetched images
-                            imageAdapter.updateImages(imagesList) // Use a method to update the list in your adapter
+                            imageAdapter.updateImages(imagesList)
                         } else {
-                            Log.e("FetchError", "Failed to fetch images: $status") // Log error message
+                            Log.e("FetchError", "Failed to fetch images: $status")
                         }
                     } catch (e: Exception) {
-                        Log.e("JSONError", "Error parsing JSON response: ${e.message}") // Log error message
+                        Log.e("JSONError", "Error parsing JSON response: ${e.message}")
                     }
                 } else {
-                    Log.e("FetchError", "Failed to fetch images. Response code: ${response.code()}") // Log error message
+                    Log.e("FetchError", "Failed to fetch images. Response code: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e("FetchError", "Error: ${t.message}") // Log error message
+                Log.e("FetchError", "Error: ${t.message}")
             }
         })
     }
