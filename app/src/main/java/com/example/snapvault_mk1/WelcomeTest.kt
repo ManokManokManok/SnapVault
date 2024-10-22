@@ -118,9 +118,8 @@ class WelcomeActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.welcomeTextView).text = "Welcome, $username\nEmail: $userEmail\nUser ID: $user_Id"
 
-        if (user_Id != -1) {
-            fetchImages(user_Id) // Fetch images for the logged-in user
-        }
+        // Fetch images for the logged-in user
+        fetchImages(user_Id)
 
         // Check if permission is already granted
         if (!checkPermission()) {
@@ -128,6 +127,16 @@ class WelcomeActivity : AppCompatActivity() {
         }
 
         setClickListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
+        val user_Id = sharedPreferences.getInt("user_id", -1)
+
+        if (user_Id != -1) {
+            fetchImages(user_Id) // Fetch images again when returning to the activity
+        }
     }
 
     private fun initializeRetrofit() {

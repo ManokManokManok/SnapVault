@@ -1,5 +1,7 @@
 package com.example.snapvault_mk1
 
+import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +25,15 @@ class ImageAdapter(private val images: MutableList<String>) : RecyclerView.Adapt
         Glide.with(holder.itemView.context)
             .load(imageUrl)
             .into(holder.imageView)
+
+        // Set a click listener to open the image viewer
+        holder.imageView.setOnClickListener {
+            val context = holder.itemView.context
+            Log.d("ImageAdapter", "Image URL clicked: $imageUrl")
+            val intent = Intent(context, ImageViewerActivity::class.java)
+            intent.putExtra("imageUri", imageUrl) // Pass the image URL as an extra
+            context.startActivity(intent) // Start the ImageViewerActivity
+        }
     }
 
     override fun getItemCount(): Int = images.size
