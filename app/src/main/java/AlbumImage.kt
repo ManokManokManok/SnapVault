@@ -7,5 +7,6 @@ import kotlinx.parcelize.Parcelize
 data class AlbumImage(
     val id: Int,
     val image_path: String,
-    val album_id: Int
+    val album_id: Int,
+    val imagePaths: List<String>
 ) : Parcelable

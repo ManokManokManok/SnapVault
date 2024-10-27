@@ -1,29 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
+    <!-- Album name TextView -->
     <TextView
         android:id="@+id/albumsname"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_margin="10dp"
-        android:text="Albums"
-        android:padding="10dp"
-        android:layout_marginLeft="10dp"
+        android:background="@color/lightergreen"
+        android:text="(Album Name)"
+        android:gravity="center"
+        android:fontFamily="@font/fredoka_regular"
         android:textColor="#FF000000"
         android:textSize="30dp"
-
         android:textStyle="bold" />
 
+    <!-- RecyclerView for album images -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="70dp"
         android:padding="16dp"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:layout_above="@+id/navbarContainer" />
 
+    <!-- Navbar container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/navbarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/lightergreen">
+
+        <!-- Navbar background -->
+        <ImageView
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@color/lightergreen"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <!-- Home icon -->
+        <ImageView
+            android:id="@+id/info"
+            android:layout_width="51dp"
+            android:layout_height="46dp"
+            android:src="@drawable/info_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="50dp" />
+
+        <!-- Folder icon -->
+        <ImageView
+            android:id="@+id/addimage"
+            android:layout_width="51dp"
+            android:layout_height="46dp"
+            android:background="@drawable/upload_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"/>
+
+        <!-- Person icon -->
+        <ImageView
+            android:id="@+id/deletealbum"
+            android:layout_width="51dp"
+            android:layout_height="46dp"
+            android:src="@drawable/delete_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="50dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

@@ -116,7 +116,7 @@ class WelcomeActivity : AppCompatActivity() {
             return
         }
 
-        findViewById<TextView>(R.id.welcomeTextView).text = "Welcome, $username\nEmail: $userEmail\nUser ID: $user_Id"
+        findViewById<TextView>(R.id.welcomeTextView).text = "$username's Gallery"
 
         // Fetch images for the logged-in user
         fetchImages(user_Id)

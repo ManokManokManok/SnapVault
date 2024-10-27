@@ -57,11 +57,8 @@ class Files : AppCompatActivity() {
         userId = sharedPreferences.getInt("user_id", -1)
         val username = sharedPreferences.getString("username", "User") // Retrieve username
 
-        val albumsTextView = findViewById<TextView>(R.id.albums)
-        albumsTextView.text = "User ID: $userId"
-        albumsTextView.visibility = View.INVISIBLE  // Ensure it's visible
 
-        findViewById<TextView>(R.id.welcomeTextView).text = "Album of $username"
+        findViewById<TextView>(R.id.welcomeTextView).text = "$username's Albums"
 
 
         homeIcon = findViewById(R.id.home)
@@ -90,6 +87,15 @@ class Files : AppCompatActivity() {
             fetchAlbums(userId)
         } else {
             Toast.makeText(this, "User ID not found. Please log in again.", Toast.LENGTH_SHORT).show()
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
+        val user_Id = sharedPreferences.getInt("user_id", -1)
+
+        if (user_Id != -1) {
+            fetchAlbums(user_Id) // Fetch images again when returning to the activity
         }
     }
 
@@ -136,21 +142,32 @@ class Files : AppCompatActivity() {
 
         builder.setTitle("Create New Album with SnapVault")
             .setView(dialogView)
-            .setPositiveButton("Create") { dialog, _ ->
+            .setPositiveButton("Create") { dialog, _ -> /* Do nothing here, we will handle it manually */ }
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+
+        val dialog = builder.create() // Create the dialog but don't show it yet
+
+        dialog.setOnShowListener {
+            val createButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            createButton.setOnClickListener {
                 val albumName = albumNameEditText.text.toString().trim() // Trim whitespace
-                if (isValidAlbumName(albumName)) { // Validate the album name
+
+                // Check for maximum length of album name
+                if (albumName.length > 25) {
+                    Toast.makeText(this, "Album name too long. Max 25 characters allowed.", Toast.LENGTH_SHORT).show()
+                } else if (isValidAlbumName(albumName)) { // Validate the album name
                     createAlbum(userId, albumName)
+                    dialog.dismiss() // Dismiss the dialog only after successful creation
                 } else {
                     Toast.makeText(this, "Invalid album name. Please use letters and numbers only.", Toast.LENGTH_SHORT).show()
                 }
-                dialog.dismiss()
             }
-            .setNegativeButton("Cancel") { dialog, _ ->
-                dialog.dismiss()
-            }
+        }
 
-        builder.show()
+        dialog.show() // Show the dialog
     }
+
+
 
     private fun createAlbum(userId: Int, albumName: String) {
         val createAlbumService = ApiClient.getRetrofitInstance().create(CreateAlbumService::class.java)
