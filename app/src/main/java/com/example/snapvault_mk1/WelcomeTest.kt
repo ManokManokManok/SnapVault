@@ -65,6 +65,9 @@ class WelcomeActivity : AppCompatActivity() {
 
     private var selectedImageUri: Uri? = null
 
+    private var backPressedTime: Long = 0
+    private val backPressTimeout: Long = 3000 // 3 seconds
+
     // Register permission result handler
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (isGranted) {
@@ -150,8 +153,8 @@ class WelcomeActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recyclerView)
 
-        // Set the GridLayoutManager to display 2 items per row
-        recyclerView.layoutManager = GridLayoutManager(this, 3) // Change '2' to adjust the number of columns
+        // Set the GridLayoutManager to display 3 items per row
+        recyclerView.layoutManager = GridLayoutManager(this, 3)
 
         imageAdapter = ImageAdapter(mutableListOf())
         recyclerView.adapter = imageAdapter
@@ -267,8 +270,19 @@ class WelcomeActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e("FetchError", "Error: ${t.message}")
+                Log.e("FetchError", t.message.toString())
             }
         })
+    }
+
+    override fun onBackPressed() {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - backPressedTime < backPressTimeout) {
+            super.onBackPressed()
+            finish() // Close the app
+        } else {
+            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            backPressedTime = currentTime
+        }
     }
 }
