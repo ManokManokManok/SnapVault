@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
-}
 
+}
 android {
     namespace = "com.example.snapvault_mk1"
     compileSdk = 34
@@ -49,6 +49,19 @@ android {
         }
     }
 }
+
+buildscript {
+    repositories {
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0-Beta2")
+    }
+}
+
+apply(plugin = "org.jetbrains.kotlin.plugin.parcelize")
 
 dependencies {
 
