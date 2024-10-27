@@ -194,4 +194,13 @@ class Files : AppCompatActivity() {
         val regex = Regex("^[a-zA-Z0-9 ]+\$") // Adjusted regex to include only letters, numbers, and spaces
         return albumName.isNotBlank() && regex.matches(albumName) // Ensure it is not blank
     }
+
+    override fun onBackPressed() {
+        // Create an Intent to navigate back to WelcomeActivity
+        val intent = Intent(this, WelcomeActivity::class.java)
+        // Clear the current activity and any other activities in the back stack
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish() // Finish the current activity
+    }
 }

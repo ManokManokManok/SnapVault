@@ -85,7 +85,11 @@ class User : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        // Optional: You can implement your custom back button functionality here
-        super.onBackPressed() // Default back button behavior
+        // Create an Intent to navigate back to WelcomeActivity
+        val intent = Intent(this, WelcomeActivity::class.java)
+        // Clear the current activity and any other activities in the back stack
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish() // Finish the current activity
     }
 }

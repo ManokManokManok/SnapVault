@@ -1,5 +1,6 @@
 package com.example.snapvault_mk1
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -217,5 +218,13 @@ class AlbumImagesActivity : AppCompatActivity() {
 
     private fun showPasswordDialog() {
         // No longer needed since password setting feature is removed
+    }
+    override fun onBackPressed() {
+        // Create an Intent to navigate back to WelcomeActivity
+        val intent = Intent(this, WelcomeActivity::class.java)
+        // Clear the current activity and any other activities in the back stack
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish() // Finish the current activity
     }
 }
