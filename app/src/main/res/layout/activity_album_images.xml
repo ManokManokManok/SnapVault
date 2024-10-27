@@ -27,6 +27,15 @@
         android:textSize="30dp"
         android:textStyle="bold" />
 
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="51dp"
+        android:layout_height="46dp"
+        android:background="@drawable/back_icon"
+        android:layout_margin="7dp"
+        android:layout_alignTop="@id/albumsname"
+        />
+
     <!-- RecyclerView for album images -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

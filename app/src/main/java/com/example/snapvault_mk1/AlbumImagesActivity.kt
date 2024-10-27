@@ -45,7 +45,8 @@ class AlbumImagesActivity : AppCompatActivity() {
     private lateinit var addimage: ImageView
     private lateinit var info: ImageView
     private lateinit var delete: ImageView
-    private lateinit var albumsnameTextView: TextView // Move this to class scope
+    private lateinit var albumsnameTextView: TextView
+    private lateinit var backIcon: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +58,12 @@ class AlbumImagesActivity : AppCompatActivity() {
         addimage = findViewById(R.id.addimage)
         info = findViewById(R.id.info)
         delete = findViewById(R.id.deletealbum)
+        backIcon = findViewById(R.id.back)
+
+        backIcon.setOnClickListener {
+            startActivity(Intent(this, Files::class.java))
+            finish()
+        }
 
         // Get the album ID from the intent
         albumId = intent.getIntExtra("albumId", -1)

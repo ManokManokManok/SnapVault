@@ -153,7 +153,7 @@
             android:id="@+id/folder"
             android:layout_width="51dp"
             android:layout_height="46dp"
-            android:background="@drawable/ic_folder"
+            android:background="@drawable/album_icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
