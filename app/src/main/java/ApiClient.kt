@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2/" // Replace with your server's IP or domain
+    private const val BASE_URL = "http://192.168.1.9/" // Replace with your server's IP or domain
 
     private var retrofit: Retrofit? = null
 
