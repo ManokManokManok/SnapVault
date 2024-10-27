@@ -27,6 +27,13 @@ class Files : AppCompatActivity() {
         @FormUrlEncoded
         @POST("get_user_albums.php")
         fun getUserAlbums(@Field("user_id") userId: Int): Call<List<Album>>
+
+        @FormUrlEncoded
+        @POST("rename_album.php")
+        fun renameAlbum(
+            @Field("album_id") albumId: Int,
+            @Field("new_album_name") newAlbumName: String
+        ): Call<Album> // Adjust the return type if needed
     }
 
     interface CreateAlbumService {
@@ -45,7 +52,7 @@ class Files : AppCompatActivity() {
     private lateinit var scrollView: ScrollView
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var albumRecyclerView: RecyclerView
-    private var userId: Int = -1
+    var userId: Int = -1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,7 +106,9 @@ class Files : AppCompatActivity() {
         }
     }
 
-    private fun fetchAlbums(userId: Int) {
+
+
+    fun fetchAlbums(userId: Int) {
         val albumService = ApiClient.getRetrofitInstance().create(AlbumStuff::class.java)
 
         albumService.getUserAlbums(userId).enqueue(object : Callback<List<Album>> {

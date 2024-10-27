@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_rename"
-        android:title="Rename"/>
+        android:id="@+id/rename"
+        android:title="Rename" />
     <item
-        android:id="@+id/action_add_password"
-        android:title="Add Password"/>
+        android:id="@+id/add_password"
+        android:title="Add Password" />
 </menu>
+
