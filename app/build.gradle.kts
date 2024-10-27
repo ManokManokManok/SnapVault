@@ -63,6 +63,8 @@ buildscript {
 
 apply(plugin = "org.jetbrains.kotlin.plugin.parcelize")
 
+
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)

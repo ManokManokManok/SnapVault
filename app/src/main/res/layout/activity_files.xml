@@ -15,34 +15,6 @@
         android:orientation="vertical"
         android:background="@color/white">
 
-        <TextView
-            android:id="@+id/files"
-            android:text="All Files"
-            android:layout_width="400dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="16dp"
-            android:textSize="35dp"
-            android:textStyle="bold"
-            android:textColor="#FF000000"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <EditText
-            android:id="@+id/search_bar"
-            android:layout_width="310dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginStart="10dp"
-            android:padding="15dp"
-            android:fontFamily="@font/fredoka_regular"
-            android:background="@drawable/semi_circle_corner"
-            android:hint="Search your files"
-            android:textColor="@color/black"
-            android:textColorHint="@color/black"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/files" />
 
         <TextView
             android:id="@+id/albums"
@@ -52,20 +24,9 @@
             android:textStyle="bold"
             android:textColor="#FF000000"
             android:textSize="30dp"
-            app:layout_constraintTop_toBottomOf="@+id/search_bar"
+            app:layout_constraintTop_toBottomOf="@+id/welcomeTextView"
             android:layout_margin="10dp"/>
 
-        <TextView
-            android:id="@+id/usernameicon"
-            android:layout_width="60dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="340dp"
-            android:background="@drawable/semi_circle_left"
-            android:drawableLeft="@drawable/imagesearch_icon"
-            android:padding="15dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/files" />
 
         <ImageView
             android:id="@+id/uploadedImageView"
@@ -75,6 +36,21 @@
             android:layout_marginTop="16dp"
             android:visibility="gone"
             android:contentDescription="@string/uploaded_image_desc" />
+
+        <TextView
+            android:id="@+id/welcomeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Album of (Insert user username)"
+            android:textColor="#FF000000"
+            android:padding="10dp"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            android:layout_margin="30dp"
+            android:background="@drawable/rounded"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -115,7 +91,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="30dp"
+            android:layout_marginStart="50dp"
             />
 
         <ImageView
@@ -127,17 +103,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/home"
             android:layout_marginBottom="25dp"
-            android:layout_marginStart="50dp" />
-
-        <ImageView
-            android:id="@+id/create"
-            android:layout_width="50dp"
-            android:layout_height="46dp"
-            android:background="@drawable/create_icon"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/person"
-            android:layout_marginBottom="25dp"
-            android:layout_marginEnd="50dp" />
+            android:layout_marginStart="100dp" />
 
         <ImageView
             android:id="@+id/person"
@@ -147,7 +113,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="25dp"
-            android:layout_marginEnd="30dp" />
+            android:layout_marginEnd="50dp" />
 
         <androidx.constraintlayout.widget.Barrier
             android:layout_width="wrap_content"

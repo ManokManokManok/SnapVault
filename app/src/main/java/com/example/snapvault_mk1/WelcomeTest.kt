@@ -145,7 +145,6 @@ class WelcomeActivity : AppCompatActivity() {
 
     private fun initializeUI() {
         fileIcon = findViewById(R.id.folder)
-        createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
         uploadIcon = findViewById(R.id.uploadicon)
 
@@ -160,7 +159,6 @@ class WelcomeActivity : AppCompatActivity() {
 
     private fun setClickListeners() {
         fileIcon.setOnClickListener { startActivity(Intent(this, Files::class.java)) }
-        createIcon.setOnClickListener { startActivity(Intent(this, Createalbum::class.java)) }
         personIcon.setOnClickListener { startActivity(Intent(this, User::class.java)) }
         uploadIcon.setOnClickListener {
             if (checkPermission()) {

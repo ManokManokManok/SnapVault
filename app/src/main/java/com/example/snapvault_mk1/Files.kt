@@ -40,7 +40,6 @@ class Files : AppCompatActivity() {
 
     private lateinit var homeIcon: ImageView
     private lateinit var fileIcon: ImageView
-    private lateinit var createIcon: ImageView
     private lateinit var personIcon: ImageView
     private lateinit var newalbum: ImageView
     private lateinit var scrollView: ScrollView
@@ -48,18 +47,25 @@ class Files : AppCompatActivity() {
     private lateinit var albumRecyclerView: RecyclerView
     private var userId: Int = -1
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_files)
 
+
         sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         userId = sharedPreferences.getInt("user_id", -1)
+        val username = sharedPreferences.getString("username", "User") // Retrieve username
 
-        findViewById<TextView>(R.id.albums).text = "User ID: $userId"
+        val albumsTextView = findViewById<TextView>(R.id.albums)
+        albumsTextView.text = "User ID: $userId"
+        albumsTextView.visibility = View.INVISIBLE  // Ensure it's visible
+
+        findViewById<TextView>(R.id.welcomeTextView).text = "Album of $username"
+
 
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
-        createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
         newalbum = findViewById(R.id.newalbum)
         scrollView = findViewById(R.id.scrollView)
@@ -70,10 +76,6 @@ class Files : AppCompatActivity() {
         homeIcon.setOnClickListener {
             startActivity(Intent(this, WelcomeActivity::class.java))
             finish()
-        }
-
-        createIcon.setOnClickListener {
-            startActivity(Intent(this, Createalbum::class.java))
         }
 
         personIcon.setOnClickListener {

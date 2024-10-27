@@ -1,11 +1,13 @@
 package com.example.snapvault_mk1
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
+import android.widget.TextView
 import okhttp3.ResponseBody
 import org.json.JSONObject
 import retrofit2.Call
@@ -32,7 +34,9 @@ class AlbumImagesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_album_images)
 
+        // Initialize RecyclerView and TextView for album name
         recyclerView = findViewById(R.id.recyclerView)
+        val albumsnameTextView = findViewById<TextView>(R.id.albumsname)
 
         // Get the album ID from the intent
         albumId = intent.getIntExtra("albumId", -1)
@@ -40,7 +44,7 @@ class AlbumImagesActivity : AppCompatActivity() {
         setupRecyclerView()
 
         if (albumId != -1) {
-            fetchImagesForAlbum(albumId)
+            fetchImagesForAlbum(albumId, albumsnameTextView) // Pass TextView to update album name
         } else {
             Toast.makeText(this, "Invalid album selected.", Toast.LENGTH_SHORT).show()
             finish() // Close activity if album ID is invalid
@@ -48,12 +52,13 @@ class AlbumImagesActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        recyclerView.layoutManager = GridLayoutManager(this, 3) // Set the layout manager for a grid view
+        recyclerView.layoutManager =
+            GridLayoutManager(this, 3) // Set the layout manager for a grid view
         imageAdapter = ImageAdapter(mutableListOf()) // Initialize with an empty list
         recyclerView.adapter = imageAdapter // Set the adapter
     }
 
-    private fun fetchImagesForAlbum(albumId: Int) {
+    private fun fetchImagesForAlbum(albumId: Int, albumsnameTextView: TextView) {
         val service = ApiClient.getRetrofitInstance().create(AlbumImageService::class.java)
         service.getAlbumImages(albumId).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -69,14 +74,18 @@ class AlbumImagesActivity : AppCompatActivity() {
                         val status = jsonResponse.getString("status")
 
                         if (status == "success") {
+                            // Fetch album name from the JSON response
+                            val albumName = jsonResponse.getString("album_name")
+                            albumsnameTextView.text = albumName // Display the correct album name
+
+                            // Process images array
                             val imagesJsonArray = jsonResponse.getJSONArray("images")
                             val imagesList = mutableListOf<String>()
 
                             for (i in 0 until imagesJsonArray.length()) {
-                                // Replace escaped forward slashes
                                 imagesList.add(imagesJsonArray.getString(i).replace("\\/", "/"))
                             }
-                            imagesList.reverse() // Optional: Reverse to show the latest images first
+                            imagesList.reverse() // Optional: Reverse to show latest images first
 
                             // Update the adapter with new images
                             imageAdapter.updateImages(imagesList)
@@ -106,3 +115,4 @@ class AlbumImagesActivity : AppCompatActivity() {
             .show()
     }
 }
+

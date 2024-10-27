@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/albumsname"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:layout_margin="10dp"
+        android:text="Albums"
+        android:padding="10dp"
+        android:layout_marginLeft="10dp"
+        android:textColor="#FF000000"
+        android:textSize="30dp"
+
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
         android:padding="16dp"
-        android:clipToPadding="false"
-        android:layout_marginBottom="56dp" />
+        android:clipToPadding="false" />
+
+
 </RelativeLayout>

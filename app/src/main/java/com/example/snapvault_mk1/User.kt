@@ -30,7 +30,6 @@ class User : AppCompatActivity() {
 
         homeIcon = findViewById(R.id.home)
         fileIcon = findViewById(R.id.folder)
-        createIcon = findViewById(R.id.create)
         personIcon = findViewById(R.id.person)
         emailsettings = findViewById(R.id.emailsettings)
         usernamesettings = findViewById(R.id.usernamesettings)
@@ -55,11 +54,6 @@ class User : AppCompatActivity() {
             startActivity(intent)
         }
 
-        createIcon.setOnClickListener {
-            val intent = Intent(this, Createalbum::class.java)
-            intent.putExtra("username", username)
-            startActivity(intent)
-        }
 
         emailsettings.setOnClickListener {
             val intent = Intent(this, Settings_Email::class.java)
