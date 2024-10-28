@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.TextView
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
@@ -60,7 +60,7 @@ class AlbumAdapter(
                     true
                 }
                 R.id.add_password -> {
-                    // Handle add password action here
+                    showSetPasswordDialog(view.context, album)
                     true
                 }
                 else -> false
@@ -99,6 +99,45 @@ class AlbumAdapter(
             }
 
             override fun onFailure(call: Call<Album>, t: Throwable) {
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun showSetPasswordDialog(context: Context, album: Album) {
+        // Create EditTexts for password and confirm password
+        val passwordEditText = EditText(context).apply {
+            hint = "Password"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+
+        // Create the AlertDialog
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Set Album Password")
+            .setView(passwordEditText)
+            .setPositiveButton("Set") { dialog, _ ->
+                val password = passwordEditText.text.toString()
+                if (password.isNotEmpty()) {
+                    // Set the password for the album using your API
+                    setAlbumPassword(album.album_id, password, context)
+                }
+            }
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
+    private fun setAlbumPassword(albumId: Int, password: String, context: Context) {
+        val albumService = ApiClient.getRetrofitInstance().create(Files.AlbumStuff::class.java)
+        albumService.setAlbumPassword(albumId, password).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Password will be active on restart.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Failed to set password.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
                 Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
