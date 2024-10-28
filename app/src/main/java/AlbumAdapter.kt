@@ -105,7 +105,7 @@ class AlbumAdapter(
     }
 
     private fun showSetPasswordDialog(context: Context, album: Album) {
-        // Create EditTexts for password and confirm password
+        // Create EditTexts for password
         val passwordEditText = EditText(context).apply {
             hint = "Password"
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
@@ -117,13 +117,25 @@ class AlbumAdapter(
             .setView(passwordEditText)
             .setPositiveButton("Set") { dialog, _ ->
                 val password = passwordEditText.text.toString()
-                if (password.isNotEmpty()) {
+                if (isValidPassword(password)) {
                     // Set the password for the album using your API
                     setAlbumPassword(album.album_id, password, context)
+                } else {
+                    // Show a message and keep the dialog open
+                    Toast.makeText(context, "Invalid password. Only letters and numbers are allowed, with no spaces or special characters.", Toast.LENGTH_SHORT).show()
+                    // Reopen the dialog for re-entry
+                    dialog.dismiss() // Close the dialog, we won't dismiss it here
+                    showSetPasswordDialog(context, album) // Show it again
                 }
             }
             .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
             .show()
+    }
+
+
+    private fun isValidPassword(password: String): Boolean {
+        // Check if password is not empty and matches the regex for characters only
+        return password.isNotEmpty() && password.all { it.isLetterOrDigit() }
     }
 
     private fun setAlbumPassword(albumId: Int, password: String, context: Context) {
