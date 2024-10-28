@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.content.SharedPreferences
+import java.io.File
 
 class User : AppCompatActivity() {
 
@@ -54,7 +56,6 @@ class User : AppCompatActivity() {
             startActivity(intent)
         }
 
-
         emailsettings.setOnClickListener {
             val intent = Intent(this, Settings_Email::class.java)
             intent.putExtra("username", username)
@@ -76,11 +77,18 @@ class User : AppCompatActivity() {
             // Clear SharedPreferences
             sharedPreferences.edit().clear().apply()
 
+            // Clear app cache
+            clearAppCache()
+
+            // Verify clearing by checking user_id and username
+            val clearedUserId = sharedPreferences.getInt("user_id", -1)
+            Log.d("Logout", "Cleared user_id: $clearedUserId") // Should be -1
+
             // Start the StartPage activity and clear the stack
             val intent = Intent(this, StartPage::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
-            finish() // Optional: Finish the current activity
+            finish()
         }
     }
 
@@ -91,5 +99,39 @@ class User : AppCompatActivity() {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
         finish() // Finish the current activity
+    }
+
+    private fun clearAppCache() {
+        val cacheDir = cacheDir
+        val filesDir = filesDir
+        val externalCacheDir = externalCacheDir
+
+        // Clear the cache directory
+        if (cacheDir.isDirectory) {
+            deleteDir(cacheDir)
+        }
+
+        // Clear the files directory
+        if (filesDir.isDirectory) {
+            deleteDir(filesDir)
+        }
+
+        // Clear external cache directory if it exists
+        if (externalCacheDir != null && externalCacheDir.isDirectory) {
+            deleteDir(externalCacheDir)
+        }
+    }
+
+    // Helper method to delete a directory and its contents
+    private fun deleteDir(dir: File): Boolean {
+        if (dir.isDirectory) {
+            val children = dir.list()
+            if (children != null) {
+                for (child in children) {
+                    deleteDir(File(dir, child))
+                }
+            }
+        }
+        return dir.delete()
     }
 }

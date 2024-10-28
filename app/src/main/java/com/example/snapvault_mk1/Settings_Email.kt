@@ -128,7 +128,7 @@ class Settings_Email : AppCompatActivity() {
 
         // Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2/") // Update this as necessary
+            .baseUrl("http://192.168.43.180/") // Update this as necessary
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

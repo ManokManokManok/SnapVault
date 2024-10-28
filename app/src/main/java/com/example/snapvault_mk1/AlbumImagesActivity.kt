@@ -1,6 +1,7 @@
 package com.example.snapvault_mk1
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -35,8 +36,14 @@ class AlbumImagesActivity : AppCompatActivity() {
 
     interface AlbumDeleteService {
         @FormUrlEncoded
-        @POST("delete_album.php")
+        @POST("delete_album.php") // Add the correct endpoint for deleting albums
         fun deleteAlbum(@Field("album_id") albumId: Int): Call<ResponseBody>
+    }
+
+    interface AlbumCountService {
+        @FormUrlEncoded
+        @POST("get_album_count.php")
+        fun getAlbumCount(@Field("user_id") userId: Int): Call<ResponseBody>
     }
 
     private lateinit var recyclerView: RecyclerView
@@ -47,14 +54,18 @@ class AlbumImagesActivity : AppCompatActivity() {
     private lateinit var delete: ImageView
     private lateinit var albumsnameTextView: TextView
     private lateinit var backIcon: ImageView
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_album_images)
 
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
+
         // Initialize RecyclerView and TextView for album name
         recyclerView = findViewById(R.id.recyclerView)
-        albumsnameTextView = findViewById(R.id.albumsname) // Moved here
+        albumsnameTextView = findViewById(R.id.albumsname)
         addimage = findViewById(R.id.addimage)
         info = findViewById(R.id.info)
         delete = findViewById(R.id.deletealbum)
@@ -69,6 +80,17 @@ class AlbumImagesActivity : AppCompatActivity() {
         albumId = intent.getIntExtra("albumId", -1)
 
         setupRecyclerView()
+
+        // Fetch user ID from SharedPreferences
+        val userId = sharedPreferences.getInt("user_id", -1)
+
+        // Fetch album count for the user
+        if (userId != -1) {
+            fetchAlbumCount(userId)
+        } else {
+            Toast.makeText(this, "User ID not found.", Toast.LENGTH_SHORT).show()
+            finish()
+        }
 
         // Set up click listener for add image button
         addimage.setOnClickListener { showPasswordDialog() }
@@ -92,9 +114,42 @@ class AlbumImagesActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        recyclerView.layoutManager = GridLayoutManager(this, 3) // Set the layout manager for a grid view
-        imageAdapter = ImageAdapter(mutableListOf()) // Initialize with an empty list
-        recyclerView.adapter = imageAdapter // Set the adapter
+        recyclerView.layoutManager = GridLayoutManager(this, 3)
+        imageAdapter = ImageAdapter(mutableListOf())
+        recyclerView.adapter = imageAdapter
+    }
+
+    private fun fetchAlbumCount(userId: Int) {
+        val service = ApiClient.getRetrofitInstance().create(AlbumCountService::class.java)
+        service.getAlbumCount(userId).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    val rawResponse = response.body()?.string() ?: "No response"
+                    Log.d("RawResponse", rawResponse)
+
+                    try {
+                        val jsonResponse = JSONObject(rawResponse)
+                        val status = jsonResponse.getString("status")
+
+                        if (status == "success") {
+                            val albumCount = jsonResponse.getInt("album_count")
+                            Log.d("AlbumCount", "User has $albumCount albums.")
+                            // Store album count in a variable or SharedPreferences if needed
+                        } else {
+                            Log.e("FetchError", "Failed to fetch album count: $status")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("JSONError", "Error parsing JSON response: ${e.message}")
+                    }
+                } else {
+                    Log.e("FetchError", "Failed to fetch album count. Response code: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e("FetchError", "Error: ${t.message}")
+            }
+        })
     }
 
     private fun fetchImagesForAlbum(albumId: Int, albumsnameTextView: TextView) {
@@ -110,20 +165,17 @@ class AlbumImagesActivity : AppCompatActivity() {
                         val status = jsonResponse.getString("status")
 
                         if (status == "success") {
-                            // Fetch and display the album name regardless of the images array
                             val albumName = jsonResponse.getString("album_name")
-                            albumsnameTextView.text = albumName // Always display the album name
+                            albumsnameTextView.text = albumName
 
-                            // Process images array
                             val imagesJsonArray = jsonResponse.getJSONArray("images")
                             val imagesList = mutableListOf<String>()
 
                             for (i in 0 until imagesJsonArray.length()) {
                                 imagesList.add(imagesJsonArray.getString(i).replace("\\/", "/"))
                             }
-                            imagesList.reverse() // Optional: Reverse to show latest images first
+                            imagesList.reverse()
 
-                            // Update the adapter with new images
                             imageAdapter.updateImages(imagesList)
                         } else {
                             val albumName = jsonResponse.getString("album_name")
@@ -157,14 +209,10 @@ class AlbumImagesActivity : AppCompatActivity() {
                         val status = jsonResponse.getString("status")
 
                         if (status == "success") {
-                            // Fetch album name and creation date only
                             val albumName = jsonResponse.getString("album_name")
-                            val albumCreationDate = jsonResponse.optString("creation_date", "Unknown date") // Example additional info
+                            val albumCreationDate = jsonResponse.optString("creation_date", "Unknown date")
 
-                            // Update the TextView with the album name
                             albumsnameTextView.text = albumName
-
-                            // Show an alert dialog with the album info (without password)
                             showAlertDialog("Album Info", "Name: $albumName\nCreated On: $albumCreationDate")
                         } else {
                             Log.e("FetchError", "Failed to fetch album info: $status")
@@ -188,7 +236,13 @@ class AlbumImagesActivity : AppCompatActivity() {
         builder.setTitle("Delete Album")
             .setMessage("Are you sure you want to delete this album?")
             .setPositiveButton("Yes") { dialog, _ ->
-                deleteAlbum(albumId) // Call the method to delete the album
+                // Fetch album count before deleting
+                val userId = sharedPreferences.getInt("user_id", -1)
+                if (userId != -1) {
+                    fetchAlbumCountForDeletion(userId, albumId) // Check album count before deletion
+                } else {
+                    Toast.makeText(this, "User ID not found.", Toast.LENGTH_SHORT).show()
+                }
                 dialog.dismiss()
             }
             .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
@@ -196,22 +250,76 @@ class AlbumImagesActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun fetchAlbumCountForDeletion(userId: Int, albumId: Int) {
+        val service = ApiClient.getRetrofitInstance().create(AlbumCountService::class.java)
+        service.getAlbumCount(userId).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    val rawResponse = response.body()?.string() ?: "No response"
+                    Log.d("RawResponse", rawResponse)
+
+                    try {
+                        val jsonResponse = JSONObject(rawResponse)
+                        val status = jsonResponse.getString("status")
+
+                        if (status == "success") {
+                            val albumCount = jsonResponse.getInt("album_count")
+                            if (albumCount > 1) {
+                                deleteAlbum(albumId) // Proceed with deletion
+                            } else {
+                                Toast.makeText(this@AlbumImagesActivity, "Must have at least 1 album.", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Log.e("FetchError", "Failed to fetch album count: $status")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("JSONError", "Error parsing JSON response: ${e.message}")
+                    }
+                } else {
+                    Log.e("FetchError", "Failed to fetch album count. Response code: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e("FetchError", "Error: ${t.message}")
+            }
+        })
+    }
+
     private fun deleteAlbum(albumId: Int) {
         val service = ApiClient.getRetrofitInstance().create(AlbumDeleteService::class.java)
         service.deleteAlbum(albumId).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(this@AlbumImagesActivity, "Album deleted successfully.", Toast.LENGTH_SHORT).show()
-                    finish() // Close the activity or navigate as needed
+                    val rawResponse = response.body()?.string() ?: "No response"
+                    Log.d("RawResponse", rawResponse)
+
+                    try {
+                        val jsonResponse = JSONObject(rawResponse)
+                        val status = jsonResponse.getString("status")
+
+                        if (status == "success") {
+                            Toast.makeText(this@AlbumImagesActivity, "Album deleted successfully.", Toast.LENGTH_SHORT).show()
+                            finish() // Close activity after deletion
+                        } else {
+                            Toast.makeText(this@AlbumImagesActivity, "Failed to delete album.", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("JSONError", "Error parsing JSON response: ${e.message}")
+                    }
                 } else {
-                    Toast.makeText(this@AlbumImagesActivity, "Failed to delete album.", Toast.LENGTH_SHORT).show()
+                    Log.e("FetchError", "Failed to delete album. Response code: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Toast.makeText(this@AlbumImagesActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Log.e("FetchError", "Error: ${t.message}")
             }
         })
+    }
+
+    private fun showPasswordDialog() {
+        // Your existing logic for showing password dialog and adding images goes here
     }
 
     private fun showAlertDialog(title: String, message: String) {
@@ -221,17 +329,5 @@ class AlbumImagesActivity : AppCompatActivity() {
             .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
             .create()
             .show()
-    }
-
-    private fun showPasswordDialog() {
-        // No longer needed since password setting feature is removed
-    }
-    override fun onBackPressed() {
-        // Create an Intent to navigate back to WelcomeActivity
-        val intent = Intent(this, WelcomeActivity::class.java)
-        // Clear the current activity and any other activities in the back stack
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-        finish() // Finish the current activity
     }
 }

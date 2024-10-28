@@ -14,6 +14,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import okhttp3.ResponseBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -49,9 +51,7 @@ class Files : AppCompatActivity() {
         fun createAlbum(
             @Field("user_id") userId: Int,
             @Field("album_name") albumName: String
-        ): Call<Album>
-
-
+        ): Call<ResponseBody> // Changed to ResponseBody for parsing JSON
     }
 
     private lateinit var homeIcon: ImageView
@@ -104,9 +104,10 @@ class Files : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val user_Id = sharedPreferences.getInt("user_id", -1)
-        if (user_Id != -1) {
-            fetchAlbums(user_Id) // Fetch albums again to get the latest data, including passwords
+        val userId = sharedPreferences.getInt("user_id", -1)
+        Log.d("Files", "userId in onResume: $userId")
+        if (userId != -1) {
+            fetchAlbums(userId) // Fetch albums again to get the latest data, including passwords
         }
     }
 
@@ -117,12 +118,14 @@ class Files : AppCompatActivity() {
             override fun onResponse(call: Call<List<Album>>, response: Response<List<Album>>) {
                 if (response.isSuccessful) {
                     val albums = response.body()
-                    if (!albums.isNullOrEmpty()) {
+                    if (albums != null && albums.isNotEmpty()) {
                         // Update the adapter with the new album list
                         val adapter = AlbumAdapter(albums) { album -> onAlbumClick(album) }
                         albumRecyclerView.adapter = adapter
                     } else {
-                        Toast.makeText(this@Files, "No albums found.", Toast.LENGTH_SHORT).show()
+                        // Handle case where there are no albums
+                        Toast.makeText(this@Files, "You have no albums yet. Create one!", Toast.LENGTH_SHORT).show()
+                        albumRecyclerView.adapter = null // Clear the adapter
                     }
                 } else {
                     Toast.makeText(this@Files, "Failed to retrieve albums.", Toast.LENGTH_SHORT).show()
@@ -144,7 +147,6 @@ class Files : AppCompatActivity() {
             openAlbumImagesActivity(album.album_id)
         }
     }
-
 
     private fun showPasswordDialog(album: Album) {
         val passwordEditText = EditText(this).apply {
@@ -177,7 +179,6 @@ class Files : AppCompatActivity() {
         dialog.show()
     }
 
-
     private fun openAlbumImagesActivity(albumId: Int) {
         val intent = Intent(this, AlbumImagesActivity::class.java)
         intent.putExtra("albumId", albumId)
@@ -203,8 +204,7 @@ class Files : AppCompatActivity() {
                 if (albumName.length > 25) {
                     Toast.makeText(this, "Album name too long. Max 25 characters allowed.", Toast.LENGTH_SHORT).show()
                 } else if (isValidAlbumName(albumName)) {
-                    createAlbum(userId, albumName)
-                    dialog.dismiss()
+                    createAlbum(userId, albumName, dialog) // Pass dialog for dismissal
                 } else {
                     Toast.makeText(this, "Invalid album name. Please use letters and numbers only.", Toast.LENGTH_SHORT).show()
                 }
@@ -213,34 +213,43 @@ class Files : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun createAlbum(userId: Int, albumName: String) {
+    private fun createAlbum(userId: Int, albumName: String, dialog: AlertDialog) {
         val createAlbumService = ApiClient.getRetrofitInstance().create(CreateAlbumService::class.java)
 
-        createAlbumService.createAlbum(userId, albumName).enqueue(object : Callback<Album> {
-            override fun onResponse(call: Call<Album>, response: Response<Album>) {
+        createAlbumService.createAlbum(userId, albumName).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(this@Files, "Album created successfully.", Toast.LENGTH_SHORT).show()
-                    fetchAlbums(userId)
+                    val rawResponse = response.body()?.string() ?: "No response"
+                    val jsonResponse = JSONObject(rawResponse)
+                    val status = jsonResponse.getString("status")
+
+                    if (status == "success") {
+                        // Get the newly created album ID
+                        val newAlbumId = jsonResponse.getInt("album_id") // Assuming your API returns this
+                        Toast.makeText(this@Files, "Album created successfully.", Toast.LENGTH_SHORT).show()
+
+                        // Navigate to AlbumImagesActivity
+                        val intent = Intent(this@Files, AlbumImagesActivity::class.java)
+                        intent.putExtra("albumId", newAlbumId) // Pass the new album ID
+                        startActivity(intent)
+                        finish() // Optionally finish the current activity
+                    } else {
+                        Toast.makeText(this@Files, "Failed to create album.", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    Toast.makeText(this@Files, "Failed to create album.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@Files, "Error: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
+                dialog.dismiss() // Dismiss the dialog after processing
             }
 
-            override fun onFailure(call: Call<Album>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(this@Files, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                dialog.dismiss() // Dismiss the dialog even on failure
             }
         })
     }
 
     private fun isValidAlbumName(albumName: String): Boolean {
-        val regex = Regex("^[a-zA-Z0-9 ]+\$")
-        return albumName.isNotBlank() && regex.matches(albumName)
-    }
-
-    override fun onBackPressed() {
-        val intent = Intent(this, WelcomeActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-        finish()
+        return albumName.all { it.isLetterOrDigit() || it.isWhitespace() }
     }
 }
