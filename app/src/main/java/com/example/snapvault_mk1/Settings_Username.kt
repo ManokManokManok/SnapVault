@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.os.Bundle
+import android.text.InputType
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -36,6 +38,8 @@ class Settings_Username : AppCompatActivity() {
     private var isPopupShown = false
     private lateinit var sharedPreferences: SharedPreferences
     private var accountUsername: String? = null
+    private lateinit var passwordEditText: EditText
+    private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,11 +55,15 @@ class Settings_Username : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         accountUsername = sharedPreferences.getString("username", null)
+        passwordEditText = findViewById(R.id.password)
 
         val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
         val popup = listOf<View>(
             findViewById(R.id.background),
             findViewById(R.id.curruser),
+            findViewById(R.id.usericon),
+            findViewById(R.id.passicon),
+            findViewById(R.id.passicon2),
             findViewById(R.id.newuser),
             findViewById(R.id.password), // Add reference to the password input
             findViewById(R.id.confirmbutton),
@@ -81,6 +89,7 @@ class Settings_Username : AppCompatActivity() {
         val currentUsernameInput = findViewById<EditText>(R.id.curruser)
         val newUsernameInput = findViewById<EditText>(R.id.newuser)
         val passwordInput = findViewById<EditText>(R.id.password) // Reference the password input
+        val password = passwordEditText.text.toString()
 
         // Set onClickListener for the confirm button
         confirmButton.setOnClickListener {
@@ -97,6 +106,37 @@ class Settings_Username : AppCompatActivity() {
             // Change username if the current username is valid and password is provided
             changeUsername(currentUsername, newUsername, password)
         }
+        passwordEditText.setOnTouchListener { v, event ->
+            val DRAWABLE_RIGHT = 2
+
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableRight = passwordEditText.compoundDrawables[DRAWABLE_RIGHT]
+
+                if (drawableRight != null) {
+                    val boundsWidth = drawableRight.bounds.width()
+                    val drawableAreaStart = passwordEditText.right - boundsWidth - passwordEditText.paddingRight
+
+                    if (event.rawX >= drawableAreaStart) {
+                        togglePasswordVisibility()
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+            false
+        }
+    }
+
+    private fun togglePasswordVisibility() {
+        if (isPasswordVisible) {
+            passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            passwordEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.eyev, 0)
+        } else {
+            passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            passwordEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.eyecnot, 0)
+        }
+
+        passwordEditText.setSelection(passwordEditText.text.length)
+        isPasswordVisible = !isPasswordVisible
     }
 
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {

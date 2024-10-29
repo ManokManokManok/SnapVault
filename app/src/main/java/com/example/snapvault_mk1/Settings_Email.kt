@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.os.Bundle
+import android.text.InputType
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -36,6 +38,8 @@ class Settings_Email : AppCompatActivity() {
     private var isPopupShown = false
     private lateinit var sharedPreferences: SharedPreferences
     private var accountEmail: String? = null
+    private lateinit var passwordEditText: EditText
+    private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,18 +55,21 @@ class Settings_Email : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         accountEmail = sharedPreferences.getString("email", null)
+        passwordEditText = findViewById(R.id.password)
 
         val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
         val popup = listOf<View>(
             findViewById(R.id.background),
             findViewById(R.id.curremail),
             findViewById(R.id.newemail),
+            findViewById(R.id.passicon2),
             findViewById(R.id.password), // Added password input field
             findViewById(R.id.emailicon),
             findViewById(R.id.passicon),
             findViewById(R.id.confirmbutton),
             findViewById(R.id.back)
         )
+
 
         val backbutton = findViewById<Button>(R.id.back)
 
@@ -83,6 +90,7 @@ class Settings_Email : AppCompatActivity() {
         val currentEmailInput = findViewById<EditText>(R.id.curremail)
         val newEmailInput = findViewById<EditText>(R.id.newemail)
         val passwordInput = findViewById<EditText>(R.id.password) // Password input field
+        val password = passwordEditText.text.toString()
 
         // Set click listener for the confirm button
         confirmButton.setOnClickListener {
@@ -103,7 +111,41 @@ class Settings_Email : AppCompatActivity() {
             // Change email if everything is valid
             changeEmail(currentEmail, newEmail, password)
         }
+
+        passwordEditText.setOnTouchListener { v, event ->
+            val DRAWABLE_RIGHT = 2
+
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableRight = passwordEditText.compoundDrawables[DRAWABLE_RIGHT]
+
+                if (drawableRight != null) {
+                    val boundsWidth = drawableRight.bounds.width()
+                    val drawableAreaStart = passwordEditText.right - boundsWidth - passwordEditText.paddingRight
+
+                    if (event.rawX >= drawableAreaStart) {
+                        togglePasswordVisibility()
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+            false
+        }
     }
+
+    private fun togglePasswordVisibility() {
+        if (isPasswordVisible) {
+            passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            passwordEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.eyev, 0)
+        } else {
+            passwordEditText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            passwordEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.eyecnot, 0)
+        }
+
+        passwordEditText.setSelection(passwordEditText.text.length)
+        isPasswordVisible = !isPasswordVisible
+    }
+
+
 
     private fun showPopup(popupViews: List<View>, heightOfScreen: Int) {
         popupViews.forEach { view ->
@@ -118,6 +160,8 @@ class Settings_Email : AppCompatActivity() {
         }
     }
 
+
+
     // Updated function to handle the password as well
     private fun changeEmail(currentEmail: String, newEmail: String, password: String) {
         // Check if the new email and password fields are not empty
@@ -128,7 +172,7 @@ class Settings_Email : AppCompatActivity() {
 
         // Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.180/") // Update this as necessary
+            .baseUrl("http://192.168.43.171/") // Update this as necessary
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

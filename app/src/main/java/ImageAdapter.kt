@@ -31,6 +31,8 @@ class ImageAdapter(private val images: MutableList<String>) : RecyclerView.Adapt
             val context = holder.itemView.context
             val intent = Intent(context, ImageViewerActivity::class.java)
             intent.putExtra("imageUri", imageUrl)
+            intent.putStringArrayListExtra("imageList", ArrayList(images)) // Pass the list of images
+            intent.putExtra("imagePosition", position) // Pass the current position
             context.startActivity(intent)
         }
     }

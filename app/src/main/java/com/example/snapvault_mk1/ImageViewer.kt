@@ -49,6 +49,8 @@ class ImageViewerActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
     private var imageId: Int? = null // Assuming you have an ID to identify the image
     private var albums: List<Album>? = null // List to hold user albums
+    private var imageList: List<String>? = null
+    private var currentPosition: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +60,12 @@ class ImageViewerActivity : AppCompatActivity() {
         addto = findViewById(R.id.addto)
         deleteButton = findViewById(R.id.delete) // Assuming you added this button
         info = findViewById(R.id.info)
+        imageList = intent.getStringArrayListExtra("imageList") // Retrieve the image list
+        currentPosition = intent.getIntExtra("imagePosition", 0) // Retrieve the current position
+
+        loadCurrentImage()
+
+
 
         val imageUriString = intent.getStringExtra("imageUri")
         imageId = intent.getIntExtra("imageId", -1) // Get the image ID if available
@@ -66,6 +74,13 @@ class ImageViewerActivity : AppCompatActivity() {
         if (imageUriString != null) {
             imageUri = Uri.parse(imageUriString)
             Glide.with(this).load(imageUri).into(imageView)
+        }
+
+        findViewById<ImageView>(R.id.nextButton).setOnClickListener {
+            goToNextImage()
+        }
+        findViewById<ImageView>(R.id.previousButton).setOnClickListener {
+            goToPreviousImage()
         }
 
         deleteButton.setOnClickListener {
@@ -79,6 +94,30 @@ class ImageViewerActivity : AppCompatActivity() {
 
         addto.setOnClickListener {
             fetchUserAlbums() // Fetch albums when addto button is clicked
+        }
+    }
+
+    private fun loadCurrentImage() {
+        if (imageList != null && currentPosition in imageList!!.indices) {
+            Glide.with(this).load(imageList!![currentPosition]).into(imageView)
+        }
+    }
+
+    private fun goToNextImage() {
+        if (imageList != null && currentPosition < imageList!!.size - 1) {
+            currentPosition++
+            loadCurrentImage()
+        } else {
+            Toast.makeText(this, "No next image available.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun goToPreviousImage() {
+        if (imageList != null && currentPosition > 0) {
+            currentPosition--
+            loadCurrentImage()
+        } else {
+            Toast.makeText(this, "No previous image available.", Toast.LENGTH_SHORT).show()
         }
     }
 

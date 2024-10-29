@@ -55,6 +55,8 @@ class Settings_Password : AppCompatActivity() {
         val heightOfScreen = Resources.getSystem().displayMetrics.heightPixels
         val popup = listOf<View>(
             findViewById(R.id.background),
+            findViewById(R.id.emailicon),
+            findViewById(R.id.passicon),
             findViewById(R.id.currpass),
             findViewById(R.id.newpass),
             findViewById(R.id.confirmbutton),
