@@ -57,7 +57,6 @@
         android:layout_width="100dp"
         android:layout_height="match_parent"
         android:layout_marginBottom="70dp"
-        android:src="@drawable/arrow_back"
         />
 
     <ImageView
@@ -66,7 +65,6 @@
         android:layout_marginBottom="70dp"
         android:layout_height="match_parent"
         android:layout_marginStart="246dp"
-        android:src="@drawable/arrow_next"
         app:layout_constraintStart_toEndOf="@id/previousButton"
         />
 
