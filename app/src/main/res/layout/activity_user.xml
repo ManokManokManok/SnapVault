@@ -134,7 +134,7 @@
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            android:background="@color/lightergreen"
+            android:background="@drawable/bottom_nav"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -153,7 +153,7 @@
             android:id="@+id/folder"
             android:layout_width="51dp"
             android:layout_height="46dp"
-            android:background="@drawable/album_icon"
+            android:background="@drawable/sorting_images"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -19,7 +19,7 @@
         android:id="@+id/albumsname"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/lightergreen"
+        android:background="@drawable/top_nav"
         android:text="(Album Name)"
         android:gravity="center"
         android:fontFamily="@font/fredoka_regular"
@@ -59,7 +59,7 @@
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="70dp"
-            android:background="@color/lightergreen"
+            android:background="@drawable/bottom_nav"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
