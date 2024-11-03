@@ -41,6 +41,17 @@
         android:layout_marginEnd="70dp"
         />
 
+    <ImageView
+        android:id="@+id/downloadbutton"
+        android:layout_width="61dp"
+        android:layout_height="56dp"
+        android:src="@drawable/download_icon"
+        android:background="@drawable/navbar_icon_selected_background"
+        app:layout_constraintBottom_toTopOf="@id/background"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="50dp"
+        android:layout_marginEnd="25dp"/>
+
 
     <ImageView
         android:id="@+id/delete"
@@ -63,7 +74,7 @@
         android:id="@+id/nextButton"
         android:layout_width="100dp"
         android:layout_marginBottom="70dp"
-        android:layout_height="match_parent"
+        android:layout_height="550dp"
         android:layout_marginStart="246dp"
         app:layout_constraintStart_toEndOf="@id/previousButton"
         />

@@ -1,8 +1,11 @@
 package com.example.snapvault_mk1
 
+import android.app.DownloadManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -46,6 +49,7 @@ class ImageViewerActivity : AppCompatActivity() {
     private lateinit var deleteButton: ImageView
     private lateinit var addto: ImageView
     private lateinit var info: ImageView
+    private lateinit var downloadbutt: ImageView
     private var imageUri: Uri? = null
     private var imageId: Int? = null // Assuming you have an ID to identify the image
     private var albums: List<Album>? = null // List to hold user albums
@@ -60,12 +64,11 @@ class ImageViewerActivity : AppCompatActivity() {
         addto = findViewById(R.id.addto)
         deleteButton = findViewById(R.id.delete) // Assuming you added this button
         info = findViewById(R.id.info)
+        downloadbutt = findViewById(R.id.downloadbutton) // Initialize download button
         imageList = intent.getStringArrayListExtra("imageList") // Retrieve the image list
         currentPosition = intent.getIntExtra("imagePosition", 0) // Retrieve the current position
 
         loadCurrentImage()
-
-
 
         val imageUriString = intent.getStringExtra("imageUri")
         imageId = intent.getIntExtra("imageId", -1) // Get the image ID if available
@@ -95,10 +98,15 @@ class ImageViewerActivity : AppCompatActivity() {
         addto.setOnClickListener {
             fetchUserAlbums() // Fetch albums when addto button is clicked
         }
+
+        downloadbutt.setOnClickListener {
+            downloadImage() // Call the method to download the image
+        }
     }
 
     private fun loadCurrentImage() {
         if (imageList != null && currentPosition in imageList!!.indices) {
+            imageUri = Uri.parse(imageList!![currentPosition])
             Glide.with(this).load(imageList!![currentPosition]).into(imageView)
         }
     }
@@ -232,29 +240,23 @@ class ImageViewerActivity : AppCompatActivity() {
     }
 
     private fun showUploadTimeDialog(uploadTime: String) {
-        // Retrieve the username from SharedPreferences
-        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE) // Match the preferences name
-        val username = sharedPreferences.getString("username", "Unknown User") // Match the key used in WelcomeActivity
-
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Info")
-        builder.setMessage("Uploaded by: $username\n\nUploaded on: $uploadTime")
-        builder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-        builder.show()
+        AlertDialog.Builder(this)
+            .setTitle("Image Info")
+            .setMessage("Upload Time: $uploadTime")
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     private fun showDeleteConfirmationDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Confirm Deletion")
-        builder.setMessage("Are you sure you want to delete this image?")
-        builder.setPositiveButton("Yes") { dialog, which ->
-            deleteImageFromDatabase() // Call the method to delete the image
-        }
-        builder.setNegativeButton("No") { dialog, which -> dialog.dismiss() } // Just close the dialog
-        builder.show()
+        AlertDialog.Builder(this)
+            .setTitle("Delete Image")
+            .setMessage("Are you sure you want to delete this image?")
+            .setPositiveButton("Yes") { dialog, which -> deleteImage() }
+            .setNegativeButton("No", null)
+            .show()
     }
 
-    private fun deleteImageFromDatabase() {
+    private fun deleteImage() {
         if (imageUri == null) {
             Toast.makeText(this, "Image URI is not available.", Toast.LENGTH_SHORT).show()
             return
@@ -267,25 +269,35 @@ class ImageViewerActivity : AppCompatActivity() {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@ImageViewerActivity, "Image deleted successfully.", Toast.LENGTH_SHORT).show()
-                    finish() // Close the viewer after deletion
+                    finish() // Close the activity after deletion
                 } else {
                     Toast.makeText(this@ImageViewerActivity, "Failed to delete image.", Toast.LENGTH_SHORT).show()
-                    Log.e("DeleteError", "Response code: ${response.code()}")
+                    Log.e("DeleteImageError", "Response code: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(this@ImageViewerActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("DeleteError", "Error: ${t.message}")
+                Log.e("DeleteImageError", "Error: ${t.message}")
             }
         })
     }
-    override fun onBackPressed() {
-        // Create an Intent to navigate back to WelcomeActivity
-        val intent = Intent(this, WelcomeActivity::class.java)
-        // Clear the current activity and any other activities in the back stack
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-        finish() // Finish the current activity
+
+    private fun downloadImage() {
+        if (imageUri == null) {
+            Toast.makeText(this, "Image URI is not available.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val request = DownloadManager.Request(imageUri)
+        request.setTitle("Image Download")
+        request.setDescription("Downloading image...")
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "downloaded_image.jpg")
+
+        val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager.enqueue(request)
+
+        Toast.makeText(this, "Download started...", Toast.LENGTH_SHORT).show()
     }
 }
