@@ -1,6 +1,7 @@
 package com.example.snapvault_mk1
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.View
@@ -45,6 +46,7 @@ class AlbumAdapter(
         holder.dotIcon.setOnClickListener { view ->
             showPopupMenu(view, album)
         }
+
     }
 
     override fun getItemCount(): Int = albums.size
@@ -63,11 +65,52 @@ class AlbumAdapter(
                     showSetPasswordDialog(view.context, album)
                     true
                 }
+                R.id.delete_album -> {
+                    showDeleteConfirmationDialog(view.context, album)
+                    true
+                }
                 else -> false
             }
         }
         popupMenu.show()
     }
+
+    private fun showDeleteConfirmationDialog(context: Context, album: Album) {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Delete Album")
+            .setMessage("Are you sure you want to delete this album?")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteAlbum(album.album_id, context)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteAlbum(albumId: Int, context: Context) {
+        val albumService = ApiClient.getRetrofitInstance().create(Files.AlbumStuff::class.java)
+        albumService.deleteAlbum(albumId).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "Album deleted successfully", Toast.LENGTH_SHORT).show()
+
+                    // Remove album from the local list and update the adapter
+                    (albums as MutableList).removeIf { it.album_id == albumId }
+                    notifyDataSetChanged()
+
+                    // Optionally, refresh from the server again
+                    (context as Files).fetchAlbums(context.userId)
+                } else {
+                    Toast.makeText(context, "Failed to delete album. Server returned error.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Toast.makeText(context, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+
 
     private fun showRenameDialog(context: Context, album: Album) {
         val builder = AlertDialog.Builder(context)

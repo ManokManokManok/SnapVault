@@ -19,9 +19,11 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 class Files : AppCompatActivity() {
 
@@ -36,6 +38,11 @@ class Files : AppCompatActivity() {
             @Field("album_id") albumId: Int,
             @Field("new_album_name") newAlbumName: String
         ): Call<Album>
+
+        @FormUrlEncoded
+        @POST("delete_album.php")
+        fun deleteAlbum(@Field("album_id") albumId: Int
+        ): Call<Void>
 
         @FormUrlEncoded
         @POST("set_album_password.php") // Ensure this matches your PHP script path
