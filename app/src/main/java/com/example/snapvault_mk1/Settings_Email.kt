@@ -170,14 +170,7 @@ class Settings_Email : AppCompatActivity() {
             return
         }
 
-        // Retrofit instance
-        val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.43.171/") // Update this as necessary
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val changeEmailApi = retrofit.create(ChangeEmailApi::class.java)
-
+        val changeEmailApi = ApiClient.getRetrofitInstance().create(ChangeEmailApi::class.java)
         // Make network call to change the email and validate the password
         changeEmailApi.changeEmail(currentEmail, newEmail, password)
             .enqueue(object : Callback<ResponseBody> {
