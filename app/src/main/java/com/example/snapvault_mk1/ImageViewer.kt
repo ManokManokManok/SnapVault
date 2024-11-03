@@ -21,25 +21,32 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
-// Define the API service interface for image editing (deleting and getting info)
+// Define the API service interface for image editing (deleting, getting info, adding/removing from albums)
 interface ImageEditing {
     @FormUrlEncoded
     @POST("delete_image.php")
     fun deleteImage(
-        @Field("image_uri") imageUri: String // Send the image URI to the server
+        @Field("image_uri") imageUri: String
     ): Call<ResponseBody>
 
     @FormUrlEncoded
     @POST("get_image_info.php")
     fun getImageInfo(
-        @Field("image_uri") imageUri: String // Send the image URI to the server
+        @Field("image_uri") imageUri: String
     ): Call<ResponseBody>
 
     @FormUrlEncoded
-    @POST("add_image_to_album.php") // Update this with your actual add image to album endpoint
+    @POST("add_image_to_album.php")
     fun addImageToAlbum(
         @Field("image_uri") imageUri: String,
-        @Field("album_id") albumId: Int // Send the album ID to the server
+        @Field("album_id") albumId: Int
+    ): Call<ResponseBody>
+
+    @FormUrlEncoded
+    @POST("remove_image_from_album.php")
+    fun removeImageFromAlbum(
+        @Field("image_uri") imageUri: String,
+        @Field("album_id") albumId: Int
     ): Call<ResponseBody>
 }
 
@@ -49,10 +56,11 @@ class ImageViewerActivity : AppCompatActivity() {
     private lateinit var deleteButton: ImageView
     private lateinit var addto: ImageView
     private lateinit var info: ImageView
-    private lateinit var downloadbutt: ImageView
+    private lateinit var downloadButton: ImageView
+    private lateinit var removeFrom: ImageView
     private var imageUri: Uri? = null
-    private var imageId: Int? = null // Assuming you have an ID to identify the image
-    private var albums: List<Album>? = null // List to hold user albums
+    private var imageId: Int? = null
+    private var albums: List<Album>? = null
     private var imageList: List<String>? = null
     private var currentPosition: Int = 0
 
@@ -62,16 +70,17 @@ class ImageViewerActivity : AppCompatActivity() {
 
         imageView = findViewById(R.id.imageView)
         addto = findViewById(R.id.addto)
-        deleteButton = findViewById(R.id.delete) // Assuming you added this button
+        deleteButton = findViewById(R.id.delete)
         info = findViewById(R.id.info)
-        downloadbutt = findViewById(R.id.downloadbutton) // Initialize download button
-        imageList = intent.getStringArrayListExtra("imageList") // Retrieve the image list
-        currentPosition = intent.getIntExtra("imagePosition", 0) // Retrieve the current position
+        downloadButton = findViewById(R.id.downloadbutton)
+        removeFrom = findViewById(R.id.removefromalbum)
+        imageList = intent.getStringArrayListExtra("imageList")
+        currentPosition = intent.getIntExtra("imagePosition", 0)
 
         loadCurrentImage()
 
         val imageUriString = intent.getStringExtra("imageUri")
-        imageId = intent.getIntExtra("imageId", -1) // Get the image ID if available
+        imageId = intent.getIntExtra("imageId", -1)
         Log.d("ImageViewerActivity", "Received Image URI: $imageUriString")
 
         if (imageUriString != null) {
@@ -91,16 +100,19 @@ class ImageViewerActivity : AppCompatActivity() {
         }
 
         info.setOnClickListener {
-            // Fetch and display upload time when info icon is clicked
             fetchImageInfo()
         }
 
         addto.setOnClickListener {
-            fetchUserAlbums() // Fetch albums when addto button is clicked
+            fetchUserAlbumsForAddition()
         }
 
-        downloadbutt.setOnClickListener {
-            downloadImage() // Call the method to download the image
+        removeFrom.setOnClickListener {
+            fetchUserAlbumsForRemoval()
+        }
+
+        downloadButton.setOnClickListener {
+            downloadImage()
         }
     }
 
@@ -129,8 +141,7 @@ class ImageViewerActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchUserAlbums() {
-        // Replace with your user ID retrieval logic
+    private fun fetchUserAlbumsForAddition() {
         val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
         val userId = sharedPreferences.getInt("user_id", -1)
 
@@ -139,7 +150,6 @@ class ImageViewerActivity : AppCompatActivity() {
             return
         }
 
-        // Initialize the API service for getting user albums
         val albumService = ApiClient.getRetrofitInstance().create(Files.AlbumStuff::class.java)
 
         albumService.getUserAlbums(userId).enqueue(object : Callback<List<Album>> {
@@ -147,33 +157,72 @@ class ImageViewerActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     albums = response.body()
                     if (!albums.isNullOrEmpty()) {
-                        showAlbumSelectionDialog()
+                        showAlbumSelectionDialogForAddition()
                     } else {
                         Toast.makeText(this@ImageViewerActivity, "No albums found.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Toast.makeText(this@ImageViewerActivity, "Failed to retrieve albums.", Toast.LENGTH_SHORT).show()
-                    Log.e("FetchAlbumsError", "Response code: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<List<Album>>, t: Throwable) {
                 Toast.makeText(this@ImageViewerActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("FetchAlbumsError", "Error: ${t.message}")
             }
         })
     }
 
-    private fun showAlbumSelectionDialog() {
-        val albumNames = albums?.map { it.album_name }?.toTypedArray() // Get album names
+    private fun fetchUserAlbumsForRemoval() {
+        val sharedPreferences = getSharedPreferences("userPrefs", MODE_PRIVATE)
+        val userId = sharedPreferences.getInt("user_id", -1)
+
+        if (userId == -1) {
+            Toast.makeText(this, "User ID not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val albumService = ApiClient.getRetrofitInstance().create(Files.AlbumStuff::class.java)
+
+        albumService.getUserAlbums(userId).enqueue(object : Callback<List<Album>> {
+            override fun onResponse(call: Call<List<Album>>, response: Response<List<Album>>) {
+                if (response.isSuccessful) {
+                    albums = response.body()
+                    if (!albums.isNullOrEmpty()) {
+                        showAlbumRemovalDialog()
+                    } else {
+                        Toast.makeText(this@ImageViewerActivity, "No albums found.", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(this@ImageViewerActivity, "Failed to retrieve albums.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Album>>, t: Throwable) {
+                Toast.makeText(this@ImageViewerActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun showAlbumSelectionDialogForAddition() {
+        val albumNames = albums?.map { it.album_name }?.toTypedArray()
 
         AlertDialog.Builder(this)
-            .setTitle("Select an Album")
-            .setItems(albumNames) { dialog, which ->
+            .setTitle("Select an Album to Add The Image To")
+            .setItems(albumNames) { _, which ->
                 val selectedAlbum = albums?.get(which)
-                if (selectedAlbum != null) {
-                    addImageToAlbum(selectedAlbum.album_id) // Add the image to the selected album
-                }
+                selectedAlbum?.let { addImageToAlbum(it.album_id) }
+            }
+            .show()
+    }
+
+    private fun showAlbumRemovalDialog() {
+        val albumNames = albums?.map { it.album_name }?.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle("Select an Album to Remove The Image From")
+            .setItems(albumNames) { _, which ->
+                val selectedAlbum = albums?.get(which)
+                selectedAlbum?.let { removeImageFromAlbum(it.album_id) }
             }
             .show()
     }
@@ -184,7 +233,6 @@ class ImageViewerActivity : AppCompatActivity() {
             return
         }
 
-        // Initialize the API service for adding the image to the album
         val uploadService = ApiClient.getRetrofitInstance().create(ImageEditing::class.java)
 
         uploadService.addImageToAlbum(imageUri.toString(), albumId).enqueue(object : Callback<ResponseBody> {
@@ -193,13 +241,34 @@ class ImageViewerActivity : AppCompatActivity() {
                     Toast.makeText(this@ImageViewerActivity, "Image added to album successfully.", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this@ImageViewerActivity, "Failed to add image to album.", Toast.LENGTH_SHORT).show()
-                    Log.e("AddToAlbumError", "Response code: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(this@ImageViewerActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("AddToAlbumError", "Error: ${t.message}")
+            }
+        })
+    }
+
+    private fun removeImageFromAlbum(albumId: Int) {
+        if (imageUri == null) {
+            Toast.makeText(this, "Image URI is not available.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val uploadService = ApiClient.getRetrofitInstance().create(ImageEditing::class.java)
+
+        uploadService.removeImageFromAlbum(imageUri.toString(), albumId).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@ImageViewerActivity, "Image removed from album successfully.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@ImageViewerActivity, "Failed to remove image from album.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Toast.makeText(this@ImageViewerActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -210,39 +279,30 @@ class ImageViewerActivity : AppCompatActivity() {
             return
         }
 
-        // Initialize the API service for getting image info
         val uploadService = ApiClient.getRetrofitInstance().create(ImageEditing::class.java)
 
         uploadService.getImageInfo(imageUri.toString()).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
-                    val responseBody = response.body()?.string() ?: return
-                    val jsonResponse = JSONObject(responseBody)
-                    val status = jsonResponse.getString("status")
-
-                    if (status == "success") {
-                        val uploadTime = jsonResponse.getString("upload_time")
-                        showUploadTimeDialog(uploadTime)
-                    } else {
-                        Toast.makeText(this@ImageViewerActivity, "Failed to retrieve image info.", Toast.LENGTH_SHORT).show()
-                    }
+                    val jsonResponse = JSONObject(response.body()?.string() ?: "")
+                    // Parse the info you need
+                    val imageInfo = jsonResponse.getString("info") // Adjust based on your response
+                    showImageInfoDialog(imageInfo)
                 } else {
                     Toast.makeText(this@ImageViewerActivity, "Failed to get image info.", Toast.LENGTH_SHORT).show()
-                    Log.e("FetchInfoError", "Response code: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(this@ImageViewerActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("FetchInfoError", "Error: ${t.message}")
             }
         })
     }
 
-    private fun showUploadTimeDialog(uploadTime: String) {
+    private fun showImageInfoDialog(info: String) {
         AlertDialog.Builder(this)
             .setTitle("Image Info")
-            .setMessage("Upload Time: $uploadTime")
+            .setMessage(info)
             .setPositiveButton("OK", null)
             .show()
     }
@@ -251,7 +311,7 @@ class ImageViewerActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Delete Image")
             .setMessage("Are you sure you want to delete this image?")
-            .setPositiveButton("Yes") { dialog, which -> deleteImage() }
+            .setPositiveButton("Yes") { _, _ -> deleteImage() }
             .setNegativeButton("No", null)
             .show()
     }
@@ -262,23 +322,20 @@ class ImageViewerActivity : AppCompatActivity() {
             return
         }
 
-        // Initialize the API service for deleting the image
         val uploadService = ApiClient.getRetrofitInstance().create(ImageEditing::class.java)
 
         uploadService.deleteImage(imageUri.toString()).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     Toast.makeText(this@ImageViewerActivity, "Image deleted successfully.", Toast.LENGTH_SHORT).show()
-                    finish() // Close the activity after deletion
+                    finish()
                 } else {
                     Toast.makeText(this@ImageViewerActivity, "Failed to delete image.", Toast.LENGTH_SHORT).show()
-                    Log.e("DeleteImageError", "Response code: ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Toast.makeText(this@ImageViewerActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("DeleteImageError", "Error: ${t.message}")
             }
         })
     }
@@ -290,14 +347,14 @@ class ImageViewerActivity : AppCompatActivity() {
         }
 
         val request = DownloadManager.Request(imageUri)
-        request.setTitle("Image Download")
-        request.setDescription("Downloading image...")
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "downloaded_image.jpg")
+            .setTitle("Downloading Image")
+            .setDescription("Image is being downloaded...")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "downloaded_image.jpg") // You can customize the file name
 
         val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         downloadManager.enqueue(request)
 
-        Toast.makeText(this, "Download started...", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Download started.", Toast.LENGTH_SHORT).show()
     }
 }
