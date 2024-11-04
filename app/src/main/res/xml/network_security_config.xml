@@ -7,7 +7,9 @@
         <domain includeSubdomains="true">192.168.1.9</domain>
         <domain includeSubdomains="true">192.168.43.180</domain>
         <domain includeSubdomains="true">192.168.1.11</domain>
-        <domain includeSubdomains="true">192.168.43.171</domain>
+        <domain includeSubdomains="true">192.168.0.22</domain>
+        <domain includeSubdomains="true">192.168.0.111</domain>
+
 
     </domain-config>
 </network-security-config>

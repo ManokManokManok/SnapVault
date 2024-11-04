@@ -1,5 +1,9 @@
 package com.example.snapvault_mk1
 
+import android.app.DownloadManager
+import android.net.Uri
+import android.os.Environment
+import android.view.View
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -84,6 +88,11 @@ class AlbumImagesActivity : AppCompatActivity() {
         // Fetch user ID from SharedPreferences
         val userId = sharedPreferences.getInt("user_id", -1)
 
+        val downloadButton: ImageView = findViewById(R.id.downloadbutton)
+        downloadButton.setOnClickListener {
+            downloadAllImages(imageAdapter.getImages())
+        }
+
         // Fetch album count for the user
         if (userId != -1) {
             fetchAlbumCount(userId)
@@ -112,6 +121,23 @@ class AlbumImagesActivity : AppCompatActivity() {
             finish() // Close activity if album ID is invalid
         }
     }
+
+    private fun downloadAllImages(images: List<String>) {
+        for (imageUrl in images) {
+            val uri = Uri.parse(imageUrl)
+            val request = DownloadManager.Request(uri)
+            request.setTitle("Downloading Image")
+            request.setDescription("Downloading $imageUrl")
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, uri.lastPathSegment)
+
+            val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            downloadManager.enqueue(request)
+        }
+
+        Toast.makeText(this, "Downloading images...", Toast.LENGTH_SHORT).show()
+    }
+
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = GridLayoutManager(this, 3)

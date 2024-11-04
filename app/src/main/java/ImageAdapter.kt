@@ -44,6 +44,10 @@ class ImageAdapter(private val images: MutableList<String>) : RecyclerView.Adapt
         notifyItemInserted(images.size - 1)
     }
 
+    fun getImages(): List<String> {
+        return images
+    }
+
     fun updateImages(newImages: List<String>) {
         images.clear()
         images.addAll(newImages)
