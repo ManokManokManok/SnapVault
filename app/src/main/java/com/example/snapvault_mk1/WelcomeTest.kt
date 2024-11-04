@@ -83,7 +83,7 @@ class WelcomeActivity : AppCompatActivity() {
             selectedImageUri = result.data?.data
             selectedImageUri?.let { uri ->
                 Log.d("ImageURI", "Selected Image URI: $uri")
-                Toast.makeText(this, "Selected Image URI: $uri", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Uploading Image", Toast.LENGTH_LONG).show()
                 uploadImage(uri)
             }
         }

@@ -35,6 +35,8 @@ class ChangePass : AppCompatActivity() {
     private var backPressedTime: Long = 0
     private val backPressedDelay: Long = 3000
 
+    //ITO YUNG SA FORGOT PASSWORD HA
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

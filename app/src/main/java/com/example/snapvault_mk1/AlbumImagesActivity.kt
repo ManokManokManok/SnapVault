@@ -113,15 +113,16 @@ class AlbumImagesActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        // Fetch images for the album every time the activity is started
+        // FETCH IMAGES KADA NASA ACTIVITY
         if (albumId != -1) {
-            fetchImagesForAlbum(albumId, albumsnameTextView) // Pass TextView to update album name
+            fetchImagesForAlbum(albumId, albumsnameTextView)
         } else {
             Toast.makeText(this, "Invalid album selected.", Toast.LENGTH_SHORT).show()
-            finish() // Close activity if album ID is invalid
+            finish()
         }
     }
 
+    //DOWNLOAD LAHAT NG IMAGE SA ALBUM
     private fun downloadAllImages(images: List<String>) {
         for (imageUrl in images) {
             val uri = Uri.parse(imageUrl)
@@ -138,13 +139,14 @@ class AlbumImagesActivity : AppCompatActivity() {
         Toast.makeText(this, "Downloading images...", Toast.LENGTH_SHORT).show()
     }
 
-
+    //RECYCLERVIEW STUFF
     private fun setupRecyclerView() {
         recyclerView.layoutManager = GridLayoutManager(this, 3)
         imageAdapter = ImageAdapter(mutableListOf())
         recyclerView.adapter = imageAdapter
     }
 
+    //ALBUMCOUNT
     private fun fetchAlbumCount(userId: Int) {
         val service = ApiClient.getRetrofitInstance().create(AlbumCountService::class.java)
         service.getAlbumCount(userId).enqueue(object : Callback<ResponseBody> {
@@ -178,6 +180,7 @@ class AlbumImagesActivity : AppCompatActivity() {
         })
     }
 
+        //KUKUNIN IMAGES NA NASA ALBUM
     private fun fetchImagesForAlbum(albumId: Int, albumsnameTextView: TextView) {
         val service = ApiClient.getRetrofitInstance().create(AlbumImageService::class.java)
         service.getAlbumImages(albumId).enqueue(object : Callback<ResponseBody> {
@@ -222,6 +225,7 @@ class AlbumImagesActivity : AppCompatActivity() {
         })
     }
 
+        //ALBUM INFO
     private fun fetchAlbumInfo(albumId: Int, albumsnameTextView: TextView) {
         val service = ApiClient.getRetrofitInstance().create(AlbumInfoService::class.java)
         service.getAlbumInfo(albumId).enqueue(object : Callback<ResponseBody> {
@@ -257,6 +261,7 @@ class AlbumImagesActivity : AppCompatActivity() {
         })
     }
 
+    //DELETE CONFIRMATION
     private fun showDeleteConfirmationDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Delete Album")
@@ -276,6 +281,7 @@ class AlbumImagesActivity : AppCompatActivity() {
             .show()
     }
 
+    //KUNIN ALBUM NA IDE DELETE
     private fun fetchAlbumCountForDeletion(userId: Int, albumId: Int) {
         val service = ApiClient.getRetrofitInstance().create(AlbumCountService::class.java)
         service.getAlbumCount(userId).enqueue(object : Callback<ResponseBody> {
@@ -312,6 +318,7 @@ class AlbumImagesActivity : AppCompatActivity() {
         })
     }
 
+        //DELETION
     private fun deleteAlbum(albumId: Int) {
         val service = ApiClient.getRetrofitInstance().create(AlbumDeleteService::class.java)
         service.deleteAlbum(albumId).enqueue(object : Callback<ResponseBody> {
