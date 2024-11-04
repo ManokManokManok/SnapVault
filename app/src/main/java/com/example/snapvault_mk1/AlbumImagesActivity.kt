@@ -127,7 +127,7 @@ class AlbumImagesActivity : AppCompatActivity() {
         for (imageUrl in images) {
             val uri = Uri.parse(imageUrl)
             val request = DownloadManager.Request(uri)
-            request.setTitle("Downloading Image")
+            request.setTitle("SnapVault")
             request.setDescription("Downloading $imageUrl")
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, uri.lastPathSegment)

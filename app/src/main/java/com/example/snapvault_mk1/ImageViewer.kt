@@ -347,7 +347,7 @@ class ImageViewerActivity : AppCompatActivity() {
         }
 
         val request = DownloadManager.Request(imageUri)
-            .setTitle("Downloading Image")
+            .setTitle("SnapVault")
             .setDescription("Image is being downloaded...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "downloaded_image.jpg") // You can customize the file name
